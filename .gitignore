@@ -1,0 +1,51 @@
+*.ipynb_checkpoints
+*__pycache__
+
+data/icsi/speech/*
+data/icsi/transcripts/*
+data/icsi/data_dfs/*
+results/*
+analysis/transcript_parsing/data/*
+manifest/*
+splitFeat/*
+env/*
+results.zip
+
+
+# Vim configs
+**/.vim
+
+# cached dir
+**/.cache
+
+# Thesis pdf and zip
+Thesis/*.pdf
+Thesis/*.zip
+
+# vscode settings
+**/.vscode
+
+# .env files
+#**/.env
+
+# Don't commit predictions or train_results
+# Train results are checkpoints and metrics data from different experiments
+predictions
+train_results
+
+# Don't commit local training/model checkpoints
+checkpoints
+
+# commitizen config
+*pyproject.toml
+
+# Lhotse files from notebooks
+notebooks/manifests/
+notebooks/test_dev_feats/
+notebooks/tmp
+
+# Output plots
+plots
+
+# Lhotse files for demo-notebook
+.demo-feats
