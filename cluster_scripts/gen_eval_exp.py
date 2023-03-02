@@ -9,6 +9,7 @@ Generate one experiment per line, e.g.:
 import os
 from lxml import etree
 import numpy as np
+import time
 
 # Define split for evaluation (one of 'train', 'dev' and 'test')
 SPLIT='dev'
@@ -21,7 +22,7 @@ if SPLIT=='train':
 else: SPLIT_DIR = SPLIT
 
 # Path of the model's checkpoint 
-MODEL_PATH='checkpoints/icsi_eval'
+MODEL_PATH='./checkpoints/resnet_tst'
 
 # The model config needs to be the name of one of the configs in configs.py 
 MODEL_CONFIG='resnet_base' 
@@ -74,7 +75,7 @@ PARTITIONS = {
     'test': ["Bmr013", "Bmr018", "Bro021"]
 }
 
-PREAMBLES_PATH = '../data/icsi/transcripts/preambles.mrt'
+PREAMBLES_PATH = './data/icsi/transcripts/preambles.mrt'
 
 # Maps each meeting key to the corresponding channels used in that meeting
 CHAN_AUDIO_IN_MEETING = parse_preambles(PREAMBLES_PATH)
@@ -86,8 +87,8 @@ USER = os.getenv('USER')
 SCRATCH_DISK = '/disk/scratch'  
 SCRATCH_HOME = f'{SCRATCH_DISK}/{USER}'
 
-DATA_HOME = f'{SCRATCH_HOME}/icsi/data'
-
+#DATA_HOME = f'{SCRATCH_HOME}/icsi/data'
+DATA_HOME = './data/icsi'
 base_call = (f"python segment_laughter.py --save_to_textgrid=True --save_to_audio_files=False"
              f" --config={MODEL_CONFIG} --model_path={MODEL_PATH} --thresholds={THRESHOLDS} --min_lengths={MIN_LENGTHS}")
 
@@ -101,6 +102,8 @@ audio_tracks = [(mt, chan) for mt in meetings for chan in CHAN_AUDIO_IN_MEETING[
 output_file = open(OUTPUT_FILE, "w")
 exp_counter = 0
 
+
+start_time = time.time()
 for meeting, chan in audio_tracks:   
     exp_counter+= 1
     # Note that we don't set a seed for rep - a seed is selected at random
@@ -108,12 +111,16 @@ for meeting, chan in audio_tracks:
     print(meeting, chan)
     expt_call = (
         f"{base_call} "
-        f"--input_audio_file={DATA_HOME}/speech/{SPLIT_DIR}/{meeting}/{chan} "
+        f"--input_audio_file={DATA_HOME}/speech/{meeting}/{chan} "
         f"--output_dir={DATA_HOME}/eval_output/{meeting} "
     )
+    os.system(expt_call)
     print(expt_call, file=output_file)
-
+    subtime = time.time() - start_time
+    print(f"inference time:{subtime:.2f}s\n")
 output_file.close()
+tot_train_time = time.time() - start_time
+print(f"Total training time:\n{tot_train_time:.2f}s")
 
 print(f'Generated {exp_counter} experiments for split: {SPLIT}')
 print(f' - {len(meetings)} meetings')

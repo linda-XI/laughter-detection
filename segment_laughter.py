@@ -32,11 +32,13 @@ parser.add_argument('--model_path', type=str,
 parser.add_argument('--config', type=str, default='resnet_with_augmentation')
 parser.add_argument('--thresholds', type=str, default='0.5', help='Single value or comma-separated list of thresholds to evaluate')
 parser.add_argument('--min_lengths', type=str, default='0.2', help='Single value or comma-separated list of min_lengths to evaluate')
-parser.add_argument('--input_audio_file', required=True, type=str)
+#parser.add_argument('--input_audio_file', required=True, type=str)
+parser.add_argument('--input_audio_file', type=str)
 parser.add_argument('--output_dir', type=str, default=None)
 parser.add_argument('--save_to_audio_files', type=str, default='True')
 parser.add_argument('--save_to_textgrid', type=str, default='False')
-
+parser.add_argument('--input_dir',type = str, default='./data/icsi/speech')
+parser.add_argument('--audio_names', type = str, default = 'Bmr021')
 args = parser.parse_args()
 
 
@@ -46,6 +48,8 @@ audio_path = args.input_audio_file
 save_to_audio_files = bool(strtobool(args.save_to_audio_files))
 save_to_textgrid = bool(strtobool(args.save_to_textgrid))
 output_dir = args.output_dir
+input_dir = args.input_dir
+audio_names = [x for x in args.audio_names.split(',')]
 
 # Turn comma-separated parameter strings into list of floats 
 thresholds = [float(t) for t in args.thresholds.split(',')]
@@ -78,7 +82,7 @@ else:
 # Load the audio file and features
 
 
-def load_and_pred(audio_path):
+def load_and_pred(audio_path, full_output_dir):
     '''
     Input: audio_path for audio to predict 
     Output: time taken to predict (excluding the generation of output files)
@@ -118,12 +122,12 @@ def load_and_pred(audio_path):
 
     for setting, instances in instance_dict.items():
         print(f"Found {len(instances)} laughs for threshold {setting[0]} and min_length {setting[1]}.") 
-        instance_output_dir = os.path.join(output_dir, f't_{setting[0]}', f'l_{setting[1]}')
-        save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid)
+        instance_output_dir = os.path.join(full_output_dir, f't_{setting[0]}', f'l_{setting[1]}')
+        save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
     return time_taken
 
-def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid):
+def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
     '''
     Saves given instances to disk in a form that is specified by the passed parameters. 
     Possible forms:
@@ -133,7 +137,7 @@ def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid)
     os.system(f"mkdir -p {output_dir}")
     if len(instances) > 0:
         if save_to_audio_files:
-            full_res_y, full_res_sr = librosa.load(audio_path, sr=44100)
+            full_res_y, full_res_sr = librosa.load(full_audio_path, sr=44100)
             wav_paths = []
             maxv = np.iinfo(np.int16).max
             if output_dir is None:
@@ -155,7 +159,7 @@ def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid)
             laughs_tier = tgt.IntervalTier(name='laughter', objects=[
                 tgt.Interval(l['start'], l['end'], 'laugh') for l in laughs])
             tg.add_tier(laughs_tier)
-            fname = os.path.splitext(os.path.basename(audio_path))[0]
+            fname = os.path.splitext(os.path.basename(full_audio_path))[0]
             tgt.write_to_file(tg, os.path.join(
                 output_dir, fname + '.TextGrid'))
 
@@ -198,4 +202,11 @@ def calc_real_time_factor(audio_path, iterations):
     print(
         f"Average Realtime Factor over {iterations} iterations: {av_real_time_factor:.2f}")
 
-load_and_pred(audio_path)
+#load_and_pred(audio_path)
+for meet_name in audio_names:
+    full_path = os.path.join(input_dir, meet_name)
+    full_output_dir = os.path.join(output_dir, meet_name)
+    for sph_file in os.listdir(full_path):
+        full_sph_file = os.path.join(full_path, sph_file)
+        print(full_sph_file)
+        load_and_pred(full_sph_file, full_output_dir)

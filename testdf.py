@@ -20,7 +20,7 @@ def append_to_index(index, row, meeting_id, part_id):
     index[meeting_id]["tot_events"] += 1
     return index
 
-def create_index_from_df(df):
+def create_index_from_df(df, laugh_index):
     index = {}
     meeting_groups = df.groupby(["meeting_id"])
     for meeting_id, meeting_df in meeting_groups:
@@ -31,6 +31,7 @@ def create_index_from_df(df):
         for part_id, part_df in part_groups:
             for _, row in part_df.iterrows():
                 index = append_to_index(index, row, meeting_id, part_id)
+               # index[meeting_id][part_id] = index[meeting_id][part_id] - create_meeting_laugh_seg(meeting_id, laugh_index)
     return index
 
 def get_seg_from_index(index, meeting_id):
@@ -43,7 +44,15 @@ def get_seg_from_index(index, meeting_id):
         return union
     return P.empty()
 
-
+#get union laugh set of all part_id  for a given meeting id
+def create_meeting_laugh_seg(meeting_id, laugh_index):
+    if meeting_id in index.keys():
+        whole_laugh = P.empty()
+        for part_id in laugh_index[meeting_id].keys:
+             if (part_id != 'tot_len') & (part_id != 'tot_events'):
+                 whole_laugh = whole_laugh | laugh_index[meeting_id].get(part_id, P.empty())
+        return whole_laugh
+    return P.empty()
 print(parse.laugh_only_df)
 df = parse.laugh_only_df
 #df2 = df[(df['meeting_id']!='Bmr021')&(df['meeting_id']!='Bns001')&(df['meeting_id']!='Bmr013')&(df['meeting_id']!='Bmr018')&(df['meeting_id']!='Bro021')]
@@ -52,3 +61,4 @@ print(df)
 index = create_index_from_df(df)
 print(index)
 print(get_seg_from_index(index,'Bns003'))
+

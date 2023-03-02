@@ -166,6 +166,7 @@ def create_data_df(data_dir, num_of_laugh_samples, num_of_non_laugh_samples, mee
                     laugh_seg.start, laugh_seg.length, cfg['train']['subsample_duration'])
                 laugh_seg_lists[split].append(
                     [laugh_seg.start, laugh_seg.length, sub_start, sub_duration, audio_path, laugh_seg.meeting_id, laugh_seg.chan_id, 1])
+    print(len(laugh_seg_lists['train']))
 
     # Columns for data_dfs - same for speech and laughter as they will be combined to one df
     cols = ['start', 'duration', 'sub_start', 'sub_duration', 

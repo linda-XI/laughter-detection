@@ -4,12 +4,14 @@
 data/icsi/speech/*
 data/icsi/transcripts/*
 data/icsi/data_dfs/*
+data/eval_output/*
+data/manifest/*
 results/*
 analysis/transcript_parsing/data/*
-manifest/*
-splitFeat/*
+data/splitFeat/*
 env/*
 results.zip
+preprocess_output/*
 
 
 # Vim configs

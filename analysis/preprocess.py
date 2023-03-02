@@ -147,7 +147,6 @@ def create_silence_index(laugh_index, invalid_index, noise_index, speech_index):
         ...
     }
     """
-    print('silence index')
     silence_index = {}
     for _, row in parse.info_df.iterrows():
         if row.meeting_id not in silence_index.keys():
