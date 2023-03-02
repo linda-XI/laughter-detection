@@ -47,7 +47,7 @@ notebooks/test_dev_feats/
 notebooks/tmp
 
 # Output plots
-plots
+
 
 # Lhotse files for demo-notebook
 .demo-feats
