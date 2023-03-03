@@ -60,6 +60,22 @@ METRICS_DICT = {}
     ...
 }
 '''
+class EarlyStopper:
+    def __init__(self, patience=1, min_delta=0):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.min_validation_loss = np.inf
+
+    def early_stop(self, validation_loss):
+        if validation_loss < self.min_validation_loss:
+            self.min_validation_loss = validation_loss
+            self.counter = 0
+        elif validation_loss > (self.min_validation_loss + self.min_delta):
+            self.counter += 1
+            if self.counter >= self.patience:
+                return True
+        return False
 learning_rate = 0.01  # Learning rate.
 decay_rate = 0.9999  # Learning rate decay per minibatch.
 min_learning_rate = 0.000001  # Minimum learning rate.
@@ -154,19 +170,28 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
                       verbose=True):
 
     for epoch in range(n_epochs):
+        print(f'run epoch: {epoch}')
         start_time = time.time()
 
-        train_loss = run_epoch(model, 'train', device, iterator,
+        train_loss, val_loss = run_epoch(model, 'train', device, iterator,
                                checkpoint_dir=checkpoint_dir, optimizer=optimizer,
                                log_frequency=log_frequency, checkpoint_frequency=log_frequency,
                                clip=gradient_clip, val_iterator=val_iterator,
                                verbose=verbose, epoch_num=epoch+1)
-
+        early_stopper = EarlyStopper(patience=3, min_delta=10)
         if verbose:
             end_time = time.time()
             epoch_mins, epoch_secs = torch_utils.epoch_time(
                 start_time, end_time)
             print(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
+        
+        if early_stopper.early_stop(val_loss):             
+            #if early stop: save checkpoint
+            state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
+            torch_utils.save_checkpoint(state, is_best=is_best, checkpoint=checkpoint_dir)
+            break 
+
+        
 
 
 def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimizer=None, clip=None,
@@ -419,7 +444,10 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
                     state, is_best=is_best, checkpoint=checkpoint_dir)
 
         model.epoch += 1
-        return epoch_loss / num_batches
+        
+        val_itr, val_loss_at_epoch, val_acc_at_epoch, val_prec_at_epoch, val_recall_at_epoch = _eval_for_logging(model, device,
+                                                                                                                     val_itr, val_iterator, validations__per_epoch)
+        return epoch_loss / num_batches, val_loss_at_epoch
 
 
 print("Initializing model...")
