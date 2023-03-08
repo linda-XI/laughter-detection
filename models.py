@@ -3,6 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 import torch
 from typing import Any, Callable, List, Optional, Sequence, Tuple, Union
+from torch import Tensor
 
 def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
     """
