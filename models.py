@@ -104,7 +104,7 @@ class ConvNormActivation(torch.nn.Sequential):
             params = {} if inplace is None else {"inplace": inplace}
             layers.append(activation_layer(**params))
         super().__init__(*layers)
-        _log_api_usage_once(self)
+       
         self.out_channels = out_channels
 
         if self.__class__ == ConvNormActivation:
