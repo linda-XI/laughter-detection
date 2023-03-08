@@ -37,6 +37,9 @@ MODEL_MAP['mobilenet_v2'] = {
     'block': None,
     'norm_layer': None,
     'dropout_rate': 0.2,
+    #useless params
+    'linear_layer_size': 128,
+    'filter_sizes': [128,64,32,32],
 }
 
 FEAT = {
