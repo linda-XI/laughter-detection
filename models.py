@@ -294,7 +294,7 @@ class MobileNetV2(nn.Module):
         round_nearest: int = 8,
         block: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
-        dropout: float = 0.2,
+        dropout_rate: float = 0.2,
     ) -> None:
         """
         MobileNet V2 main class
@@ -362,7 +362,7 @@ class MobileNetV2(nn.Module):
 
         # building classifier
         self.classifier = nn.Sequential(
-            nn.Dropout(p=dropout),
+            nn.Dropout(p=dropout_rate),
             nn.Linear(self.last_channel, num_classes),
         )
 
