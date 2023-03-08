@@ -177,7 +177,7 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
         print(f'run epoch: {epoch}')
         start_time = time.time()
         
-        train_loss, val_loss = run_epoch(model, 'train', device, iterator,
+        train_loss, val_loss, is_best = run_epoch(model, 'train', device, iterator,
                                checkpoint_dir=checkpoint_dir, optimizer=optimizer,
                                log_frequency=log_frequency, checkpoint_frequency=log_frequency,
                                clip=gradient_clip, val_iterator=val_iterator,
@@ -399,6 +399,7 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
             batch_accs.append(batch_acc)
             batch_precs.append(batch_prec)
             batch_recalls.append(batch_recall)
+            is_best = False
 
             if log_frequency is not None and (model.global_step + 1) % log_frequency == 0:
                 # TODO: possibly remove val_itr from return values?
@@ -455,7 +456,7 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
         
         val_itr, val_loss_at_epoch, val_acc_at_epoch, val_prec_at_epoch, val_recall_at_epoch = _eval_for_logging(model, device,
                 val_itr, val_iterator, int(val_iterator.sampler.num_cuts))
-        return epoch_loss / num_batches, val_loss_at_epoch
+        return epoch_loss / num_batches, val_loss_at_epoch, is_best
 
 
 print("Initializing model...")
