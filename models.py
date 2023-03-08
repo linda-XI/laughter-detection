@@ -2,6 +2,7 @@ import numpy as np
 from torch import nn
 import torch.nn.functional as F
 import torch
+from typing import Any, Callable, List, Optional
 
 def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
     """
