@@ -387,6 +387,7 @@ class MobileNetV2(nn.Module):
         x = nn.functional.adaptive_avg_pool2d(x, (1, 1))
         x = torch.flatten(x, 1)
         x = self.classifier(x)
+        x = torch.sigmoid(x)
         return x
 
     def forward(self, x: Tensor) -> Tensor:
