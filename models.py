@@ -295,6 +295,10 @@ class MobileNetV2(nn.Module):
         block: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         dropout_rate: float = 0.2,
+        #useless param
+        linear_layer_size = None
+        filter_sizes = None
+        
     ) -> None:
         """
         MobileNet V2 main class
