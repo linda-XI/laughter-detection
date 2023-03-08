@@ -30,8 +30,13 @@ MODEL_MAP['mobilenet_v2'] = {
     'model': models.MobileNetV2,
     'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
     'log_frequency': 200,
-    'linear_layer_size': 128,
-    'filter_sizes': [128,64,32,32],
+    'num_classes': 1,
+    'width_mult': 1.0,
+    'inverted_residual_setting': None,
+    'round_nearest': 8,
+    'block': None,
+    'norm_layer': None,
+    'dropout_rate': 0.2,
 }
 
 FEAT = {
