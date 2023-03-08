@@ -126,7 +126,12 @@ def get_seg_from_index(index, meeting_id, part_id):
     If meeting_id or part_id don't exist in index, return empty interval
     """
     if meeting_id in index.keys():
-        return index[meeting_id].get(part_id, P.empty())
+        union = P.empty()
+        for part_id in index[meeting_id].keys():
+            if (part_id != 'tot_len') & (part_id != 'tot_events'):
+                union = union | index[meeting_id].get(part_id, P.empty())
+        return union
+       # return index[meeting_id].get(part_id, P.empty())
     return P.empty()
 
 

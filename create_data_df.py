@@ -47,9 +47,20 @@ def get_random_non_laughter_segment(duration, meeting_id, silence=False):
     start = np.random.uniform(0, sample_seg.length-duration)
     speech_seg = P.closed(utils.to_frames(
         start), utils.to_frames(start+duration))
+    start_frame = 0
+    duration_frame = 0
     
     if silence and not prep.silence_index[meeting_id][sample_seg.part_id].contains(speech_seg):
-        return get_random_non_laughter_segment(duration, meeting_id, silence=True)
+        seg_list = list(prep.silence_index[meeting_id][sample_seg.part_id])
+        random_int = np.random.randint(0, len(seg_list))
+        random_seg = seg_list[random_int]
+        #index store time in frame, need to convert to second
+        start_frame = random_seg.lower
+        duration_frame = random_seg.upper - random_seg.lower
+        start = utils.to_sec(start_frame)
+        duration = utils.to_sec(duration_frame)
+
+        #return get_random_non_laughter_segment(duration, meeting_id, silence=True)
     elif (utils.seg_overlaps(speech_seg, [prep.laugh_index, prep.invalid_index], sample_seg.meeting_id, sample_seg.part_id)):
         # If segment overlaps with any laughter or invalid segment, resample
         return get_random_non_laughter_segment(duration, meeting_id)
@@ -59,6 +70,8 @@ def get_random_non_laughter_segment(duration, meeting_id, silence=False):
     
     # sanity check
     if silence:
+        speech_seg = P.open(start_frame, start_frame+duration_frame)
+        
         assert prep.silence_index[meeting_id][sample_seg.part_id].contains(speech_seg), "Randomly selected silence segment not contained in silence index."
     return [start, duration, sub_start, sub_duration, sample_seg.path, meeting_id, sample_seg.chan_id, 0]
 
@@ -151,7 +164,7 @@ def create_data_df(data_dir, num_of_laugh_samples, num_of_non_laugh_samples, mee
                         get_random_segment_from_df(laugh_seg.length, meeting_id, df=parse.speech_df))
                 for _ in range(0, noise_segs):
                     non_laugh_seg_list[split].append(
-                        get_random_segment_from_df(laugh_seg.length, meeting_id, df=parse.speech_df))
+                        get_random_segment_from_df(laugh_seg.length, meeting_id, df=parse.noise_df))
                 for _ in range(0, silence_segs):
                     non_laugh_seg_list[split].append(
                         get_random_non_laughter_segment(laugh_seg.length, meeting_id, silence=True))

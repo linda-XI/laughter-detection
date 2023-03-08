@@ -67,10 +67,13 @@ class EarlyStopper:
         self.counter = 0
         self.min_validation_loss = np.inf
 
-    def early_stop(self, validation_loss):
+    def early_stop(self, validation_loss, model,optimizer,is_best,checkpoint):
         if validation_loss < self.min_validation_loss:
             self.min_validation_loss = validation_loss
             self.counter = 0
+            #save checkpoint
+            state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
+            torch_utils.save_checkpoint(state, is_best=is_best, checkpoint=checkpoint_dir)
         elif validation_loss > (self.min_validation_loss + self.min_delta):
             self.counter += 1
             if self.counter >= self.patience:
@@ -169,26 +172,31 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
                       optimizer, iterator, log_frequency=25, val_iterator=None, gradient_clip=1.,
                       verbose=True):
 
+    val_loss_list = []
     for epoch in range(n_epochs):
         print(f'run epoch: {epoch}')
         start_time = time.time()
-
+        
         train_loss, val_loss = run_epoch(model, 'train', device, iterator,
                                checkpoint_dir=checkpoint_dir, optimizer=optimizer,
                                log_frequency=log_frequency, checkpoint_frequency=log_frequency,
                                clip=gradient_clip, val_iterator=val_iterator,
                                verbose=verbose, epoch_num=epoch+1)
-        early_stopper = EarlyStopper(patience=3, min_delta=10)
+
+        val_loss_list.append(val_loss)
+        print(val_loss_list)
+        early_stopper = EarlyStopper(patience=3, min_delta=0.0009)
         if verbose:
             end_time = time.time()
             epoch_mins, epoch_secs = torch_utils.epoch_time(
                 start_time, end_time)
             print(f'Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s')
         
-        if early_stopper.early_stop(val_loss):             
+        if early_stopper.early_stop(val_loss, model, optimizer, is_best=is_best, checkpoint=checkpoint_dir):
             #if early stop: save checkpoint
             state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
             torch_utils.save_checkpoint(state, is_best=is_best, checkpoint=checkpoint_dir)
+            
             break 
 
         
@@ -372,9 +380,9 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
         
 
     
-        print('check iterator')
+        
         for i, batch in tqdm(enumerate(iterator)):
-            print('check after tqdm')
+            
             # learning rate scheduling
             lr = (learning_rate - min_learning_rate) * \
                 decay_rate**(float(model.global_step))+min_learning_rate
@@ -437,16 +445,16 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
                     print("Validation metrics: ", val_metrics)
 
 
-            if checkpoint_frequency is not None and (model.global_step + 1) % checkpoint_frequency == 0:
-                state = torch_utils.make_state_dict(model, optimizer, model.epoch,
-                                                    model.global_step, model.best_val_loss)
-                torch_utils.save_checkpoint(
-                    state, is_best=is_best, checkpoint=checkpoint_dir)
+           # if checkpoint_frequency is not None and (model.global_step + 1) % checkpoint_frequency == 0:
+            #    state = torch_utils.make_state_dict(model, optimizer, model.epoch,
+             #                                       model.global_step, model.best_val_loss)
+              #  torch_utils.save_checkpoint(
+               #     state, is_best=is_best, checkpoint=checkpoint_dir)
 
         model.epoch += 1
         
         val_itr, val_loss_at_epoch, val_acc_at_epoch, val_prec_at_epoch, val_recall_at_epoch = _eval_for_logging(model, device,
-                                                                                                                     val_itr, val_iterator, validations__per_epoch)
+                val_itr, val_iterator, int(val_iterator.sampler.num_cuts))
         return epoch_loss / num_batches, val_loss_at_epoch
 
 

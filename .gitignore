@@ -1,10 +1,9 @@
 *.ipynb_checkpoints
 *__pycache__
 
-data/icsi/speech/*
-data/icsi/transcripts/*
-data/icsi/data_dfs/*
-data/eval_output/*
+data/icsi/*
+data/fix_manifest/*
+data/fix_splitFeat/*
 data/manifest/*
 results/*
 analysis/transcript_parsing/data/*
@@ -12,6 +11,9 @@ data/splitFeat/*
 env/*
 results.zip
 preprocess_output/*
+
+output/*
+eval/*
 
 
 # Vim configs
