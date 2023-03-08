@@ -314,6 +314,9 @@ class MobileNetV2(nn.Module):
         """
         super(MobileNetV2, self).__init__()
         
+        self.global_step = 0
+        self.epoch = 0
+        self.best_val_loss = np.inf
 
         if block is None:
             block = InvertedResidual
