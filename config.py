@@ -25,6 +25,15 @@ MODEL_MAP['resnet_with_augmentation'] = {
     'filter_sizes': [128,64,32,32],
 }
 
+MODEL_MAP['mobilenet_v2'] = {
+    'batch_size': 32,
+    'model': models.MobileNetV2,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 200,
+    'linear_layer_size': 128,
+    'filter_sizes': [128,64,32,32],
+}
+
 FEAT = {
     "num_samples": 100,
     "num_filters": 44
