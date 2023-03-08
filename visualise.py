@@ -166,6 +166,54 @@ def plot_conf_matrix(eval_df_path, split, name='conf_matrix', thresholds=[], min
     print(conf_ratio)
     if show:
         plt.show()
+        
+        
+def plot_conf_matrix2(eval_df_path, split, name='conf_matrix', thresholds=[], min_len=None, sub_dir="", show_annotations=True, show=False):
+    '''
+    Calculate and plot confusion matrix across all meetings per parameter set
+    You can specify thresholds(several) and min_len(one) which you want to include
+    If nothing passed, all thresholds and min_lens will be plotted
+    '''
+    if not show:
+        plt.clf() # clear existing plots
+
+    path = Path(eval_df_path)
+    eval_df = pd.read_csv(path / f"{split}_{cfg.ANALYSIS['eval_df_cache_file']}")
+    sum_vals = eval_df.groupby(['threshold', 'min_len'])[['corr_pred_time', 'tot_pred_time', 'tot_transc_laugh_time', 'tot_fp_speech_time', 'tot_fp_noise_time', 'tot_fp_silence_time', 'tot_fp_false_silence_time']].agg(['sum']).reset_index()
+
+    # Flatten Multi-index to Single-index
+    sum_vals.columns = sum_vals.columns.map('{0[0]}'.format) 
+
+    # Select certain thresholds and min_len if passed
+    if len(thresholds) != 0:
+        sum_vals = sum_vals[sum_vals.threshold.isin(thresholds)]
+    if min_len != None:
+        sum_vals = sum_vals[sum_vals.min_len == min_len]
+
+    print(sum_vals)
+    conf_ratio = sum_vals[['corr_pred_time', 'tot_fp_speech_time', 'tot_fp_silence_time', 'tot_fp_noise_time', 'tot_fp_false_silence_time']].copy()
+    conf_ratio = conf_ratio.div(sum_vals['tot_pred_time'], axis=0)
+    # Set all ratio-vals to 0 if there is no prediction time at all
+    conf_ratio.loc[sum_vals.tot_pred_time == 0.0, ['corr_pred_time', 'tot_fp_speech_time','tot_fp_silence_time', 'tot_fp_noise_time', 'tot_fp_false_silence_time']] = 0 
+
+
+    labels = ['laugh', 'speech', 'silence', 'noise', 'false_silence']
+
+    hm = sns.heatmap(conf_ratio, yticklabels=sum_vals['threshold'], annot=show_annotations, cmap="YlGnBu")
+    hm.set_yticklabels(sum_vals['threshold'], size = 11)
+    hm.set_xticklabels(labels, size = 12)
+    plt.ylabel('threshold', size=12)
+    plt.xticks(rotation=0)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name}.png')
+    Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
+    plt.savefig(plot_file)
+    
+    print('\n=======Confusion Matrix========')
+    print(conf_ratio)
+    if show:
+        plt.show()
 
 # ============================================
 # EXPERIMENTS 
