@@ -73,7 +73,7 @@ class EarlyStopper:
             self.counter = 0
             #save checkpoint
             state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
-            torch_utils.save_checkpoint(state, is_best=is_best, checkpoint=checkpoint_dir)
+            torch_utils.save_checkpoint(state, is_best=True, checkpoint=checkpoint_dir)
         elif validation_loss > (self.min_validation_loss + self.min_delta):
             self.counter += 1
             if self.counter >= self.patience:
@@ -195,7 +195,7 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
         if early_stopper.early_stop(val_loss, model, optimizer, is_best=is_best, checkpoint=checkpoint_dir):
             #if early stop: save checkpoint
             state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
-            torch_utils.save_checkpoint(state, is_best=is_best, checkpoint=checkpoint_dir)
+            torch_utils.save_checkpoint(state, is_best=True, checkpoint=checkpoint_dir)
             
             break 
 
