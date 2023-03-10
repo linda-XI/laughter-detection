@@ -105,6 +105,8 @@ def load_and_pred(audio_path, full_output_dir):
             preds = list(preds)
         probs += preds
     probs = np.array(probs)
+    print(probs.size)
+    
 
     file_length = audio_utils.get_audio_length(audio_path)
 
