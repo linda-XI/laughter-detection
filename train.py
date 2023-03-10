@@ -310,6 +310,8 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
         # optimizer.zero_grad()
 
         output = model(src).squeeze()
+        if model.epoch == 10:
+            print(output)
 
         criterion = nn.BCELoss()
 
