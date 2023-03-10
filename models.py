@@ -394,7 +394,7 @@ class MobileNetV2(nn.Module):
         x = nn.functional.adaptive_avg_pool2d(x, (1, 1))
         x = torch.flatten(x, 1)
         x = self.classifier(x)
-        #x = torch.sigmoid(x)
+        x = torch.sigmoid(x)
         return x
 
     def forward(self, x: Tensor) -> Tensor:
@@ -527,6 +527,7 @@ class ResNetBigger(nn.Module):
         out = F.relu(out)
         out = self.linear2(out)
         out = torch.sigmoid(out)
+        print(out)
         return out
 
     def set_device(self, device):
