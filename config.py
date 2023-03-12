@@ -25,7 +25,15 @@ MODEL_MAP['resnet_dw'] = {
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
     'filter_sizes': [64,32,16,16],
 }
-
+MODEL_MAP['resnet_dw2'] = {
+    'batch_size': 32,
+    'model': models.ResNetBigger_DW2,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100) 
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    'filter_sizes': [64,32,16,16],
+}
 MODEL_MAP['resnet_with_augmentation'] = {
     'batch_size': 32,
     'model': models.ResNetBigger,
