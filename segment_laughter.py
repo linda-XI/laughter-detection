@@ -103,6 +103,7 @@ def load_and_pred(audio_path, full_output_dir):
         
         starter.record()
         preds = model(x).cpu().detach().numpy().squeeze()
+        ender.record()
         torch.cuda.synchronize()
         curr_time = starter.elapsed_time(ender)
         batch_time_list.append(curr_time)
@@ -128,7 +129,7 @@ def load_and_pred(audio_path, full_output_dir):
         probs, thresholds=thresholds, min_lengths=min_lengths, fps=fps)
 
     #time_taken = time.time() - start_time  # stop measuring time
-    time_per_batch = sum(batch_time_list)/len(batch_time_list)
+    time_total = sum(batch_time_list)
     print(f'GPU time for inference per batch: {time_per_batch:.2f}s')
 
     for setting, instances in instance_dict.items():
@@ -136,7 +137,7 @@ def load_and_pred(audio_path, full_output_dir):
         instance_output_dir = os.path.join(full_output_dir, f't_{setting[0]}', f'l_{setting[1]}')
         save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
-    return time_per_batch, preprocessing_time
+    return time_total, preprocessing_time
 
 def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
     '''
@@ -220,8 +221,8 @@ for meet_name in audio_names:
     for sph_file in os.listdir(full_path):
         full_sph_file = os.path.join(full_path, sph_file)
         print(full_sph_file)
-        avg_batch_time, preprocessing_time = load_and_pred(full_sph_file, full_output_dir)
+        total_inference_time, preprocessing_time = load_and_pred(full_sph_file, full_output_dir)
         
     with open('inference_time.txt', 'a') as f:
-      f.write(f.write(meet_name) + ':' + str(avg_batch_time) + ';' + preprocessing_time)
+      f.write(f.write(meet_name) + ':' + str(total_inference_time) + ';' + str(preprocessing_time))
       
