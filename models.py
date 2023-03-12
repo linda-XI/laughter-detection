@@ -238,7 +238,8 @@ class DW(nn.Module):
                     inp,
                     inp,
                     stride=stride,
-                    groups=hidden_dim,
+                    groups = inp,
+                    #groups=hidden_dim,
                     norm_layer=norm_layer,
                     activation_layer=nn.ReLU6,
                 ),
@@ -252,10 +253,10 @@ class DW(nn.Module):
         self._is_cn = stride > 1
 
     def forward(self, x: Tensor) -> Tensor:
-        if self.use_res_connect:
-            return x + self.conv(x)
-        else:
-            return self.conv(x)
+        #if self.use_res_connect:
+         #   return x + self.conv(x)
+        #else:
+        return self.conv(x)
         
 class ResidualBlockNoBN(nn.Module):
     '''
@@ -333,9 +334,9 @@ class ResidualBlock(nn.Module):
 
 class ResidualBlock_DW(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
-        super(ResidualBlock, self).__init__()
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
+        super(ResidualBlock_DW, self).__init__()
+        
+        norm_layer = nn.BatchNorm2d
         block = DW
         # Conv Layer 1
 #         self.conv1 = nn.Conv2d(
@@ -620,7 +621,7 @@ class ResNetBigger(nn.Module):
 
 class ResNetBigger_DW(nn.Module):
     def __init__(self, num_classes=1, dropout_rate=0.5, linear_layer_size=192, filter_sizes=[64, 32, 16, 16]):
-        super(ResNetBigger, self).__init__()
+        super(ResNetBigger_DW, self).__init__()
         print(f"training with dropout={dropout_rate}")
         # Initial input conv
         self.conv1 = nn.Conv2d(
