@@ -662,12 +662,14 @@ class ResNetNoBN(nn.Module):
 class EfficientNet_B0(nn.Module):
     def __init__(
             self,
-            dropout: float,
+            dropout_rate: float,
             stochastic_depth_prob: float = 0.2,
             num_classes: int = 1,
             norm_layer: Optional[Callable[..., nn.Module]] = None,
             #last channel for B0 is none
             #last_channel: Optional[int] = None,
+            linear_layer_size=None,
+            filter_sizes=None
     ) -> None:
         """
         EfficientNet V1 and V2 main class
@@ -705,7 +707,7 @@ class EfficientNet_B0(nn.Module):
         firstconv_output_channels = inverted_residual_setting[0].input_channels
         layers.append(
             Conv2dNormActivation(
-                3, firstconv_output_channels, kernel_size=3, stride=2, norm_layer=norm_layer, activation_layer=nn.SiLU
+                1, firstconv_output_channels, kernel_size=3, stride=2, norm_layer=norm_layer, activation_layer=nn.SiLU
             )
         )
 
@@ -747,7 +749,7 @@ class EfficientNet_B0(nn.Module):
         self.features = nn.Sequential(*layers)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.classifier = nn.Sequential(
-            nn.Dropout(p=dropout, inplace=True),
+            nn.Dropout(p=dropout_rate, inplace=True),
             nn.Linear(lastconv_output_channels, num_classes),
         )
 
