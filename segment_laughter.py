@@ -129,15 +129,15 @@ def load_and_pred(audio_path, full_output_dir):
         probs, thresholds=thresholds, min_lengths=min_lengths, fps=fps)
 
     #time_taken = time.time() - start_time  # stop measuring time
-    time_total = sum(batch_time_list)
-    print(f'GPU time for inference per batch: {time_per_batch:.2f}s')
+    time_avg = sum(batch_time_list)/len(probs)
+    print(f'GPU time for inference per batch: {time_avg:.2f}s')
 
     for setting, instances in instance_dict.items():
         print(f"Found {len(instances)} laughs for threshold {setting[0]} and min_length {setting[1]}.") 
         instance_output_dir = os.path.join(full_output_dir, f't_{setting[0]}', f'l_{setting[1]}')
         save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
-    return time_total, preprocessing_time
+    return time_avg, preprocessing_time, file_length
 
 def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
     '''
@@ -215,14 +215,16 @@ def calc_real_time_factor(audio_path, iterations):
         f"Average Realtime Factor over {iterations} iterations: {av_real_time_factor:.2f}")
 
 #load_and_pred(audio_path)
+output_time_dir = os.path.join(output_dir,'inference_time.txt')
+f = open(output_time_dir, 'w')
 for meet_name in audio_names:
     full_path = os.path.join(input_dir, meet_name)
     full_output_dir = os.path.join(output_dir, meet_name)
     for sph_file in os.listdir(full_path):
         full_sph_file = os.path.join(full_path, sph_file)
         print(full_sph_file)
-        total_inference_time, preprocessing_time = load_and_pred(full_sph_file, full_output_dir)
+        avg_inference_time, preprocessing_time, audio_len = load_and_pred(full_sph_file, full_output_dir)
         
-    with open('inference_time.txt', 'a') as f:
-      f.write(f.write(meet_name) + ':' + str(total_inference_time) + ';' + str(preprocessing_time))
+    f.write(f'{meet_name}:avg inference time is:{avg_inference_time},preprocessing time is {preprocessing_time},audio length:{audio_len}')
+f.close()
       
