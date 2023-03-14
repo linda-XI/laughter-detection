@@ -745,6 +745,9 @@ class EfficientNet_B0(nn.Module):
                 activation_layer=nn.SiLU,
             )
         )
+        self.global_step = 0
+        self.epoch = 0
+        self.best_val_loss = np.inf
 
         self.features = nn.Sequential(*layers)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
@@ -779,6 +782,7 @@ class EfficientNet_B0(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return self._forward_impl(x)
+
     def set_device(self, device):
         for b in [self.features]:
             b.to(device)
