@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch
 from torch import nn, Tensor
-from torchvision.ops import StochasticDepth
+#from torchvision.ops import StochasticDepth
 
 # from ..ops.misc import Conv2dNormActivation, SqueezeExcitation
 # from ..transforms._presets import ImageClassification, InterpolationMode
