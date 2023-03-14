@@ -2,6 +2,8 @@ import copy
 import math
 from dataclasses import dataclass
 from functools import partial
+import collections
+from itertools import repeat
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch
@@ -31,6 +33,34 @@ class _MBConvConfig:
     @staticmethod
     def adjust_channels(channels: int, width_mult: float, min_value: Optional[int] = None) -> int:
         return _make_divisible(channels * width_mult, 8, min_value)
+
+def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
+    """
+    This function is taken from the original tf repo.
+    It ensures that all layers have a channel number that is divisible by 8
+    It can be seen here:
+    https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py
+    """
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+    # Make sure that round down does not go down by more than 10%.
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
+
+def _make_ntuple(x: Any, n: int) -> Tuple[Any, ...]:
+    """
+    Make n-tuple from input x. If x is an iterable, then we just convert it to tuple.
+    Otherwise, we will make a tuple of length n, all with value of x.
+    reference: https://github.com/pytorch/pytorch/blob/master/torch/nn/modules/utils.py#L8
+    Args:
+        x (Any): input value
+        n (int): length of the resulting tuple
+    """
+    if isinstance(x, collections.abc.Iterable):
+        return tuple(x)
+    return tuple(repeat(x, n))
 
 class ConvNormActivation(torch.nn.Sequential):
     def __init__(
