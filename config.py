@@ -25,15 +25,7 @@ MODEL_MAP['resnet_dw'] = {
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
     'filter_sizes': [64,32,16,16],
 }
-MODEL_MAP['resnet_dw2'] = {
-    'batch_size': 32,
-    'model': models.ResNetBigger_DW2,
-    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
-    'log_frequency': 900,
-    'linear_layer_size': 48, # for new features of shape (40,100) 
-    # 'linear_layer_size': 64, # original value for features of shape (44,128)
-    'filter_sizes': [64,32,16,16],
-}
+
 MODEL_MAP['resnet_with_augmentation'] = {
     'batch_size': 32,
     'model': models.ResNetBigger,
@@ -58,6 +50,21 @@ MODEL_MAP['mobilenet_v2'] = {
     #useless params
     'linear_layer_size': 128,
     'filter_sizes': [128,64,32,32],
+}
+
+MODEL_MAP['efficientnet_b0'] = {
+    'batch_size': 32,
+    'model': models.EfficientNet_B0,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+
+    'dropout': 0.2,
+    'stochastic_depth_prob':  0.2,
+    'num_classes':  1,
+
+    #un-use params
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    'filter_sizes': [64,32,16,16],
 }
 
 FEAT = {
