@@ -779,3 +779,7 @@ class EfficientNet_B0(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return self._forward_impl(x)
+    def set_device(self, device):
+        for b in [self.features]:
+            b.to(device)
+        self.to(device)
