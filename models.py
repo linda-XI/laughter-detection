@@ -4,7 +4,11 @@ import torch.nn.functional as F
 import torch
 from typing import Any, Callable, List, Optional, Sequence, Tuple, Union
 from torch import Tensor
-from utils.model_utils import Conv2dNormActivation
+import math
+import copy
+from functools import partial
+from utils.model_utils import MBConvConfig, Conv2dNormActivation
+
 
 def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
     """
@@ -21,8 +25,9 @@ def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> 
         new_v += divisor
     return new_v
 
+
 class MLPModel(nn.Module):
-    def __init__(self, linear_layer_size=101*40, hid_dim1=600, hid_dim2=100, dropout_rate=0.5, filter_sizes=None):
+    def __init__(self, linear_layer_size=101 * 40, hid_dim1=600, hid_dim2=100, dropout_rate=0.5, filter_sizes=None):
         super().__init__()
         print(f"training with dropout={dropout_rate}")
         self.input_dim = linear_layer_size
@@ -57,115 +62,14 @@ class MLPModel(nn.Module):
     def set_device(self, device):
         self.to(device)
 
-class ConvNormActivation(torch.nn.Sequential):
-    def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        kernel_size: Union[int, Tuple[int, ...]] = 3,
-        stride: Union[int, Tuple[int, ...]] = 1,
-        padding: Optional[Union[int, Tuple[int, ...], str]] = None,
-        groups: int = 1,
-        norm_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.BatchNorm2d,
-        activation_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.ReLU,
-        dilation: Union[int, Tuple[int, ...]] = 1,
-        inplace: Optional[bool] = True,
-        bias: Optional[bool] = None,
-        conv_layer: Callable[..., torch.nn.Module] = torch.nn.Conv2d,
-    ) -> None:
 
-        if padding is None:
-            if isinstance(kernel_size, int) and isinstance(dilation, int):
-                padding = (kernel_size - 1) // 2 * dilation
-            else:
-                _conv_dim = len(kernel_size) if isinstance(kernel_size, Sequence) else len(dilation)
-                kernel_size = _make_ntuple(kernel_size, _conv_dim)
-                dilation = _make_ntuple(dilation, _conv_dim)
-                padding = tuple((kernel_size[i] - 1) // 2 * dilation[i] for i in range(_conv_dim))
-        if bias is None:
-            bias = norm_layer is None
 
-        layers = [
-            conv_layer(
-                in_channels,
-                out_channels,
-                kernel_size,
-                stride,
-                padding,
-                dilation=dilation,
-                groups=groups,
-                bias=bias,
-            )
-        ]
 
-        if norm_layer is not None:
-            layers.append(norm_layer(out_channels))
 
-        if activation_layer is not None:
-            params = {} if inplace is None else {"inplace": inplace}
-            layers.append(activation_layer(**params))
-        super().__init__(*layers)
-       
-        self.out_channels = out_channels
-
-        if self.__class__ == ConvNormActivation:
-            warnings.warn(
-                "Don't use ConvNormActivation directly, please use Conv2dNormActivation and Conv3dNormActivation instead."
-            )
-            
-            
-class Conv2dNormActivation(ConvNormActivation):
-    """
-    Configurable block used for Convolution2d-Normalization-Activation blocks.
-    used in mobilenet
-    Args:
-        in_channels (int): Number of channels in the input image
-        out_channels (int): Number of channels produced by the Convolution-Normalization-Activation block
-        kernel_size: (int, optional): Size of the convolving kernel. Default: 3
-        stride (int, optional): Stride of the convolution. Default: 1
-        padding (int, tuple or str, optional): Padding added to all four sides of the input. Default: None, in which case it will be calculated as ``padding = (kernel_size - 1) // 2 * dilation``
-        groups (int, optional): Number of blocked connections from input channels to output channels. Default: 1
-        norm_layer (Callable[..., torch.nn.Module], optional): Norm layer that will be stacked on top of the convolution layer. If ``None`` this layer won't be used. Default: ``torch.nn.BatchNorm2d``
-        activation_layer (Callable[..., torch.nn.Module], optional): Activation function which will be stacked on top of the normalization layer (if not None), otherwise on top of the conv layer. If ``None`` this layer won't be used. Default: ``torch.nn.ReLU``
-        dilation (int): Spacing between kernel elements. Default: 1
-        inplace (bool): Parameter for the activation layer, which can optionally do the operation in-place. Default ``True``
-        bias (bool, optional): Whether to use bias in the convolution layer. By default, biases are included if ``norm_layer is None``.
-    """
-
-    def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        kernel_size: Union[int, Tuple[int, int]] = 3,
-        stride: Union[int, Tuple[int, int]] = 1,
-        padding: Optional[Union[int, Tuple[int, int], str]] = None,
-        groups: int = 1,
-        norm_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.BatchNorm2d,
-        activation_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.ReLU,
-        dilation: Union[int, Tuple[int, int]] = 1,
-        inplace: Optional[bool] = True,
-        bias: Optional[bool] = None,
-    ) -> None:
-
-        super().__init__(
-            in_channels,
-            out_channels,
-            kernel_size,
-            stride,
-            padding,
-            groups,
-            norm_layer,
-            activation_layer,
-            dilation,
-            inplace,
-            bias,
-            torch.nn.Conv2d,
-        )
-
-        
 class InvertedResidual(nn.Module):
     def __init__(
-        self, inp: int, oup: int, stride: int, expand_ratio: int, norm_layer: Optional[Callable[..., nn.Module]] = None
+            self, inp: int, oup: int, stride: int, expand_ratio: int,
+            norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super().__init__()
         self.stride = stride
@@ -210,12 +114,13 @@ class InvertedResidual(nn.Module):
         else:
             return self.conv(x)
 
+
 class DW(nn.Module):
     def __init__(
-        self, inp: int, oup: int, stride: int, norm_layer: Optional[Callable[..., nn.Module]] = None
+            self, inp: int, oup: int, stride: int, norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
         super().__init__()
-        
+
         self.stride = stride
         if stride not in [1, 2]:
             raise ValueError(f"stride should be 1 or 2 instead of {stride}")
@@ -223,15 +128,15 @@ class DW(nn.Module):
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
 
-#         hidden_dim = int(round(inp * expand_ratio))
-#         self.use_res_connect = self.stride == 1 and inp == oup
+        #         hidden_dim = int(round(inp * expand_ratio))
+        #         self.use_res_connect = self.stride == 1 and inp == oup
 
         layers: List[nn.Module] = []
-#         if expand_ratio != 1:
-#             # pw
-#             layers.append(
-#                 Conv2dNormActivation(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer, activation_layer=nn.ReLU6)
-#             )
+        #         if expand_ratio != 1:
+        #             # pw
+        #             layers.append(
+        #                 Conv2dNormActivation(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer, activation_layer=nn.ReLU6)
+        #             )
         layers.extend(
             [
                 # dw
@@ -239,8 +144,8 @@ class DW(nn.Module):
                     inp,
                     inp,
                     stride=stride,
-                    groups = inp,
-                    #groups=hidden_dim,
+                    groups=inp,
+                    # groups=hidden_dim,
                     norm_layer=norm_layer,
                     activation_layer=nn.ReLU6,
                 ),
@@ -254,11 +159,12 @@ class DW(nn.Module):
         self._is_cn = stride > 1
 
     def forward(self, x: Tensor) -> Tensor:
-        #if self.use_res_connect:
-         #   return x + self.conv(x)
-        #else:
+        # if self.use_res_connect:
+        #   return x + self.conv(x)
+        # else:
         return self.conv(x)
-        
+
+
 class ResidualBlockNoBN(nn.Module):
     '''
     ResNet without Batch Normalisation
@@ -278,7 +184,7 @@ class ResidualBlockNoBN(nn.Module):
             in_channels=out_channels, out_channels=out_channels,
             kernel_size=(3, 3), stride=1, padding=1, bias=True
         )
-        #self.bn2 = nn.BatchNorm2d(out_channels)
+        # self.bn2 = nn.BatchNorm2d(out_channels)
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_channels != out_channels:
@@ -333,25 +239,25 @@ class ResidualBlock(nn.Module):
         out = nn.ReLU()(out)
         return out
 
+
 class ResidualBlock_DW(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
         super(ResidualBlock_DW, self).__init__()
-        
+
         norm_layer = nn.BatchNorm2d
         block = DW
         # Conv Layer 1
-#         self.conv1 = nn.Conv2d(
-#             in_channels=in_channels, out_channels=out_channels,
-#             kernel_size=(3, 3), stride=stride, padding=1, bias=True
-#         )
+        #         self.conv1 = nn.Conv2d(
+        #             in_channels=in_channels, out_channels=out_channels,
+        #             kernel_size=(3, 3), stride=stride, padding=1, bias=True
+        #         )
         self.conv1 = block(in_channels, out_channels, stride, norm_layer=norm_layer)
-      
 
         # Conv Layer 2
-#         self.conv2 = nn.Conv2d(
-#             in_channels=out_channels, out_channels=out_channels,
-#             kernel_size=(3, 3), stride=1, padding=1, bias=True
-#         )
+        #         self.conv2 = nn.Conv2d(
+        #             in_channels=out_channels, out_channels=out_channels,
+        #             kernel_size=(3, 3), stride=1, padding=1, bias=True
+        #         )
         self.conv2 = block(out_channels, out_channels, 1, norm_layer=norm_layer)
 
         self.shortcut = nn.Sequential()
@@ -370,21 +276,22 @@ class ResidualBlock_DW(nn.Module):
         out += self.shortcut(x)
         out = nn.ReLU()(out)
         return out
-    
+
+
 class MobileNetV2(nn.Module):
     def __init__(
-        self,
-        num_classes: int = 1,
-        width_mult: float = 1.0,
-        inverted_residual_setting: Optional[List[List[int]]] = None,
-        round_nearest: int = 8,
-        block: Optional[Callable[..., nn.Module]] = None,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
-        dropout_rate: float = 0.2,
-        #useless param
-        linear_layer_size = None,
-        filter_sizes = None
-        
+            self,
+            num_classes: int = 1,
+            width_mult: float = 1.0,
+            inverted_residual_setting: Optional[List[List[int]]] = None,
+            round_nearest: int = 8,
+            block: Optional[Callable[..., nn.Module]] = None,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
+            dropout_rate: float = 0.2,
+            # useless param
+            linear_layer_size=None,
+            filter_sizes=None
+
     ) -> None:
         """
         MobileNet V2 main class
@@ -399,7 +306,7 @@ class MobileNetV2(nn.Module):
             dropout (float): The droupout probability
         """
         super(MobileNetV2, self).__init__()
-        
+
         self.global_step = 0
         self.epoch = 0
         self.best_val_loss = np.inf
@@ -480,18 +387,18 @@ class MobileNetV2(nn.Module):
         x = nn.functional.adaptive_avg_pool2d(x, (1, 1))
         x = torch.flatten(x, 1)
         x = self.classifier(x)
-        #x = torch.sigmoid(x)
+        # x = torch.sigmoid(x)
         return x
 
     def forward(self, x: Tensor) -> Tensor:
         return self._forward_impl(x)
-    
+
     def set_device(self, device):
         for b in [self.features]:
             b.to(device)
-        self.to(device)    
+        self.to(device)
 
-    
+
 class ResNet(nn.Module):
     '''
     Resnet model that is smaller than 'ResNetBigger' and 'ResNetNoBN'
@@ -620,6 +527,7 @@ class ResNetBigger(nn.Module):
             b.to(device)
         self.to(device)
 
+
 class ResNetBigger_DW(nn.Module):
     def __init__(self, num_classes=1, dropout_rate=0.5, linear_layer_size=192, filter_sizes=[64, 32, 16, 16]):
         super(ResNetBigger_DW, self).__init__()
@@ -685,6 +593,7 @@ class ResNetBigger_DW(nn.Module):
             b.to(device)
         self.to(device)
 
+
 class ResNetBigger_DW2(nn.Module):
     def __init__(self, num_classes=1, dropout_rate=0.5, linear_layer_size=192, filter_sizes=[64, 32, 16, 16]):
         super(ResNetBigger_DW2, self).__init__()
@@ -749,7 +658,6 @@ class ResNetBigger_DW2(nn.Module):
             b.to(device)
         self.to(device)
 
-        
 
 class ResNetNoBN(nn.Module):
     '''
@@ -765,7 +673,7 @@ class ResNetNoBN(nn.Module):
             stride=1, padding=1, bias=False
         )
 
-        #self.bn1 = nn.BatchNorm2d(64)
+        # self.bn1 = nn.BatchNorm2d(64)
 
         self.linear_layer_size = linear_layer_size
 
@@ -799,10 +707,10 @@ class ResNetNoBN(nn.Module):
         out = self.block4(out)
         out = nn.AvgPool2d(4)(out)
         out = out.view(out.size(0), -1)
-        #out = self.bn2(out)
+        # out = self.bn2(out)
         out = self.dropout(out)
         out = self.linear1(out)
-        #out = self.bn3(out)
+        # out = self.bn3(out)
         out = self.dropout(out)
         out = F.relu(out)
         out = self.linear2(out)
@@ -814,15 +722,14 @@ class ResNetNoBN(nn.Module):
             b.to(device)
         self.to(device)
 
-class EfficientNet(nn.Module):
+
+class EfficientNet_B0(nn.Module):
     def __init__(
-        self,
-        inverted_residual_setting: Sequence[Union[MBConvConfig, FusedMBConvConfig]],
-        dropout: float,
-        stochastic_depth_prob: float = 0.2,
-        num_classes: int = 1000,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
-        last_channel: Optional[int] = None,
+            self,
+            dropout: float,
+            stochastic_depth_prob: float = 0.2,
+            num_classes: int = 1,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         """
         EfficientNet V1 and V2 main class
@@ -835,16 +742,21 @@ class EfficientNet(nn.Module):
             norm_layer (Optional[Callable[..., nn.Module]]): Module specifying the normalization layer to use
             last_channel (int): The number of channels on the penultimate layer
         """
-        super().__init__()
-        _log_api_usage_once(self)
+        super(EfficientNet_B0, self).__init__()
 
-        if not inverted_residual_setting:
-            raise ValueError("The inverted_residual_setting should not be empty")
-        elif not (
-            isinstance(inverted_residual_setting, Sequence)
-            and all([isinstance(s, _MBConvConfig) for s in inverted_residual_setting])
-        ):
-            raise TypeError("The inverted_residual_setting should be List[MBConvConfig]")
+        bneck_conf = partial(MBConvConfig, width_mult=1.0, depth_mult=1.0)
+        # inverted_residual_setting = Sequence[Union[MBConvConfig, FusedMBConvConfig]]
+        #last param control num of layers
+        inverted_residual_setting = [
+            bneck_conf(1, 3, 1, 32, 16, 1),
+            bneck_conf(6, 3, 2, 16, 24, 2),
+            bneck_conf(6, 5, 2, 24, 40, 2),
+            bneck_conf(6, 3, 2, 40, 80, 3),
+            bneck_conf(6, 5, 1, 80, 112, 3),
+            bneck_conf(6, 5, 2, 112, 192, 4),
+            bneck_conf(6, 3, 1, 192, 320, 1),
+        ]
+        last_channel = None
 
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -926,4 +838,4 @@ class EfficientNet(nn.Module):
         return x
 
     def forward(self, x: Tensor) -> Tensor:
-        return self._forward_impl(x)        
+        return self._forward_impl(x)
