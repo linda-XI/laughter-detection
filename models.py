@@ -856,7 +856,9 @@ class ResNet32(nn.Module):
             width_per_group: int = 64,
             replace_stride_with_dilation: Optional[List[bool]] = None,
             norm_layer: Optional[Callable[..., nn.Module]] = None,
-            dropout_rate=0.5
+            dropout_rate=0.5,
+            linear_layer_size=None,
+            filter_sizes=None
     ) -> None:
         super(ResNet32, self).__init__()
 
@@ -988,7 +990,9 @@ class ResNet50(nn.Module):
             width_per_group: int = 64,
             replace_stride_with_dilation: Optional[List[bool]] = None,
             norm_layer: Optional[Callable[..., nn.Module]] = None,
-            dropout_rate=0.5
+            dropout_rate=0.5,
+            linear_layer_size=None,
+            filter_sizes=None
     ) -> None:
         super(ResNet50, self).__init__()
 
