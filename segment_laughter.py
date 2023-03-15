@@ -21,6 +21,7 @@ import scipy.io.wavfile
 from tqdm import tqdm
 import tgt
 import load_data
+
 sys.path.append('./utils/')
 import torch_utils
 import audio_utils
@@ -30,17 +31,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str,
                     default='checkpoints/in_use/resnet_with_augmentation')
 parser.add_argument('--config', type=str, default='resnet_with_augmentation')
-parser.add_argument('--thresholds', type=str, default='0.5', help='Single value or comma-separated list of thresholds to evaluate')
-parser.add_argument('--min_lengths', type=str, default='0.2', help='Single value or comma-separated list of min_lengths to evaluate')
-#parser.add_argument('--input_audio_file', required=True, type=str)
+parser.add_argument('--thresholds', type=str, default='0.5',
+                    help='Single value or comma-separated list of thresholds to evaluate')
+parser.add_argument('--min_lengths', type=str, default='0.2',
+                    help='Single value or comma-separated list of min_lengths to evaluate')
+# parser.add_argument('--input_audio_file', required=True, type=str)
 parser.add_argument('--input_audio_file', type=str)
 parser.add_argument('--output_dir', type=str, default=None)
 parser.add_argument('--save_to_audio_files', type=str, default='True')
 parser.add_argument('--save_to_textgrid', type=str, default='False')
-parser.add_argument('--input_dir',type = str, default='./data/icsi/speech')
-parser.add_argument('--audio_names', type = str, default = 'Bmr021')
+parser.add_argument('--input_dir', type=str, default='./data/icsi/speech')
+parser.add_argument('--audio_names', type=str, default='Bmr021')
 args = parser.parse_args()
-
 
 model_path = args.model_path
 config = config.MODEL_MAP[args.config]
@@ -65,19 +67,20 @@ model = config['model'](
 model.set_device(device)
 
 if os.path.exists(model_path):
-    #if device == 'cuda':
-    if  torch.cuda.is_available():    
-        print(model_path+'/best.pth.tar')
-        torch_utils.load_checkpoint(model_path+'/best.pth.tar', model)
+    # if device == 'cuda':
+    if torch.cuda.is_available():
+        print(model_path + '/best.pth.tar')
+        torch_utils.load_checkpoint(model_path + '/best.pth.tar', model)
     else:
         # Different method needs to be used when using CPU
         # see https://pytorch.org/tutorials/beginner/saving_loading_models.html for details
         checkpoint = torch.load(
-            model_path+'/best.pth.tar', lambda storage, loc: storage)
+            model_path + '/best.pth.tar', lambda storage, loc: storage)
         model.load_state_dict(checkpoint['state_dict'])
     model.eval()
 else:
     raise Exception(f"Model checkpoint not found at {model_path}")
+
 
 # Load the audio file and features
 
@@ -98,28 +101,26 @@ def load_and_pred(audio_path, full_output_dir):
     for model_inputs in tqdm(inference_generator):
         # x = torch.from_numpy(model_inputs).float().to(device)
         # Model inputs from new inference generator are tensors already
-        model_inputs = model_inputs[:,None,:,:] # add additional dimension
+        model_inputs = model_inputs[:, None, :, :]  # add additional dimension
         x = model_inputs.float().to(device)
-        
+
         starter.record()
         preds = model(x).cpu().detach().numpy().squeeze()
         ender.record()
         torch.cuda.synchronize()
         curr_time = starter.elapsed_time(ender)
         batch_time_list.append(curr_time)
-        
+
         if len(preds.shape) == 0:
             preds = [float(preds)]
         else:
             preds = list(preds)
         probs += preds
     probs = np.array(probs)
-    
-    
 
     file_length = audio_utils.get_audio_length(audio_path)
 
-    fps = len(probs)/float(file_length)
+    fps = len(probs) / float(file_length)
 
     # Removed because it can output probs < 0
     # probs = laugh_segmenter.lowpass(probs)
@@ -128,16 +129,17 @@ def load_and_pred(audio_path, full_output_dir):
     instance_dict = laugh_segmenter.get_laughter_instances(
         probs, thresholds=thresholds, min_lengths=min_lengths, fps=fps)
 
-    #time_taken = time.time() - start_time  # stop measuring time
-    time_avg = sum(batch_time_list)/len(probs)
+    # time_taken = time.time() - start_time  # stop measuring time
+    time_avg = sum(batch_time_list) / len(probs)
     print(f'GPU time for inference per batch: {time_avg:.2f}s')
 
     for setting, instances in instance_dict.items():
-        print(f"Found {len(instances)} laughs for threshold {setting[0]} and min_length {setting[1]}.") 
+        print(f"Found {len(instances)} laughs for threshold {setting[0]} and min_length {setting[1]}.")
         instance_output_dir = os.path.join(full_output_dir, f't_{setting[0]}', f'l_{setting[1]}')
         save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
-    return time_avg, preprocessing_time, file_length
+    return sum(batch_time_list), preprocessing_time, file_length
+
 
 def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
     '''
@@ -178,6 +180,7 @@ def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid,
             print('Saved laughter segments in {}'.format(
                 os.path.join(output_dir, fname + '.TextGrid')))
 
+
 def i_pred():
     """
     Interactive Prediction Shell running until interrupted
@@ -205,26 +208,33 @@ def calc_real_time_factor(audio_path, iterations):
 
     sum_time = 0
     for i in range(0, iterations):
-        print(f'On iteration {i+1}')
+        print(f'On iteration {i + 1}')
         sum_time += load_and_pred(audio_path)
 
-    av_time = sum_time/iterations
+    av_time = sum_time / iterations
     # Realtime factor is the 'time taken for prediction' / 'duration of input audio'
-    av_real_time_factor = av_time/audio_length
+    av_real_time_factor = av_time / audio_length
     print(
         f"Average Realtime Factor over {iterations} iterations: {av_real_time_factor:.2f}")
 
-#load_and_pred(audio_path)
-output_time_dir = os.path.join(output_dir,'inference_time.txt')
-f = open(output_time_dir, 'w')
+
+# load_and_pred(audio_path)
+output_time_dir = os.path.join(output_dir, 'inference_time.txt')
+# f = open(output_time_dir, 'w')
+tot_list = []
 for meet_name in audio_names:
     full_path = os.path.join(input_dir, meet_name)
     full_output_dir = os.path.join(output_dir, meet_name)
     for sph_file in os.listdir(full_path):
+
         full_sph_file = os.path.join(full_path, sph_file)
         print(full_sph_file)
-        avg_inference_time, preprocessing_time, audio_len = load_and_pred(full_sph_file, full_output_dir)
-        
-    f.write(f'{meet_name}:avg inference time is:{avg_inference_time},preprocessing time is {preprocessing_time},audio length:{audio_len}')
-f.close()
-      
+        total_inference_time, preprocessing_time, audio_len = load_and_pred(full_sph_file, full_output_dir)
+        rtf = total_inference_time / (audio_len * 1000)
+        sub_list = [meet_name, sph_file, rtf, preprocessing_time, audio_len]
+        tot_list.append(sub_list)
+        # f.write(
+        #     f'{meet_name}:real time factor is:{rtf},preprocessing time is {preprocessing_time},audio length:{audio_len}')
+# f.close()
+cols = ['meeting_id', 'chan', 'rtf', 'preprocessing time', 'audio length']
+df = pd.DataFrame(tot_list, columns=cols)
