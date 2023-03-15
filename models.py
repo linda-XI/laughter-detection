@@ -804,7 +804,7 @@ class ResNet8(nn.Module):
         self.block1 = self._create_block(64, filter_sizes[0], stride=1)
         self.block2 = self._create_block(
             filter_sizes[0], filter_sizes[1], stride=2)
-        self.bn2 = nn.BatchNorm1d(linear_layer_size)
+        self.bn2 = nn.BatchNorm1d(48)
         self.bn3 = nn.BatchNorm1d(32)
         self.linear1 = nn.Linear(linear_layer_size, 32)
         self.linear2 = nn.Linear(32, num_classes)
@@ -856,6 +856,7 @@ class ResNet32(nn.Module):
             width_per_group: int = 64,
             replace_stride_with_dilation: Optional[List[bool]] = None,
             norm_layer: Optional[Callable[..., nn.Module]] = None,
+            dropout_rate=0.5
     ) -> None:
         super(ResNet32, self).__init__()
 
@@ -987,6 +988,7 @@ class ResNet50(nn.Module):
             width_per_group: int = 64,
             replace_stride_with_dilation: Optional[List[bool]] = None,
             norm_layer: Optional[Callable[..., nn.Module]] = None,
+            dropout_rate=0.5
     ) -> None:
         super(ResNet50, self).__init__()
 
