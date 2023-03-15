@@ -173,7 +173,7 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
                       verbose=True):
 
     val_loss_list = []
-    early_stopper = EarlyStopper(patience=3, min_delta=0.005)
+    early_stopper = EarlyStopper(patience=7, min_delta=0.005)
     for epoch in range(n_epochs):
         print(f'run epoch: {epoch}')
         start_time = time.time()
@@ -194,8 +194,8 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
         
         if early_stopper.early_stop(val_loss, model, optimizer, is_best=is_best, checkpoint=checkpoint_dir):
             #if early stop: save checkpoint
-            state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
-            torch_utils.save_checkpoint(state, is_best=True, checkpoint=checkpoint_dir)
+            #state = torch_utils.make_state_dict(model, optimizer, model.epoch, model.global_step, model.best_val_loss)
+            #torch_utils.save_checkpoint(state, is_best=True, checkpoint=checkpoint_dir)
             
             break 
 
