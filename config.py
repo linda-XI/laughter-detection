@@ -26,6 +26,36 @@ MODEL_MAP['resnet_dw'] = {
     'filter_sizes': [64,32,16,16],
 }
 
+MODEL_MAP['resnet8'] = {
+    'batch_size': 32,
+    'model': models.ResNet8,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    'filter_sizes': [64,32,16,16],
+}
+
+MODEL_MAP['resnet32'] = {
+    'batch_size': 32,
+    'model': models.ResNet32,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    'filter_sizes': [64,32,16,16],
+}
+
+MODEL_MAP['resnet50'] = {
+    'batch_size': 32,
+    'model': models.ResNet50,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    'filter_sizes': [64,32,16,16],
+}
+
 MODEL_MAP['resnet_with_augmentation'] = {
     'batch_size': 32,
     'model': models.ResNetBigger,
