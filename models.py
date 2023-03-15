@@ -786,7 +786,7 @@ class EfficientNet_B0(nn.Module):
 
 
 class ResNet8(nn.Module):
-    def __init__(self, num_classes=1, dropout_rate=0.5, linear_layer_size=192, filter_sizes=[64, 32, 16, 16]):
+    def __init__(self, num_classes=1, dropout_rate=0.5, linear_layer_size=1920, filter_sizes=[64, 32, 16, 16]):
         super(ResNet8, self).__init__()
         print(f"training with dropout={dropout_rate}")
         # Initial input conv
@@ -804,7 +804,7 @@ class ResNet8(nn.Module):
         self.block1 = self._create_block(64, filter_sizes[0], stride=1)
         self.block2 = self._create_block(
             filter_sizes[0], filter_sizes[1], stride=2)
-        self.bn2 = nn.BatchNorm1d(48)
+        self.bn2 = nn.BatchNorm1d(linear_layer_size)
         self.bn3 = nn.BatchNorm1d(32)
         self.linear1 = nn.Linear(linear_layer_size, 32)
         self.linear2 = nn.Linear(32, num_classes)
