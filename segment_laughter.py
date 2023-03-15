@@ -219,7 +219,7 @@ def calc_real_time_factor(audio_path, iterations):
 
 
 # load_and_pred(audio_path)
-output_time_dir = os.path.join(output_dir, 'inference_time.txt')
+output_time_dir = os.path.join(output_dir, 'inference_time.csv')
 # f = open(output_time_dir, 'w')
 tot_list = []
 for meet_name in audio_names:
@@ -238,3 +238,4 @@ for meet_name in audio_names:
 # f.close()
 cols = ['meeting_id', 'chan', 'rtf', 'preprocessing time', 'audio length']
 df = pd.DataFrame(tot_list, columns=cols)
+df.to_csv(output_time_dir, index=False)
