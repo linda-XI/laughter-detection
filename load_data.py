@@ -50,5 +50,5 @@ def create_inference_dataloader(audio_path):
 
     # Construct a Pytorch Dataset class for inference using the
     dataset = InferenceDataset(feats_all)
-    dataloader = DataLoader(dataset, batch_size=1)
+    dataloader = DataLoader(dataset, batch_size=32)
     return dataloader

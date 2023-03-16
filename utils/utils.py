@@ -13,6 +13,7 @@ def get_feat_extractor(num_samples, num_filters, use_kaldi=False):
     '''
     # Frame shift is given in seconds. Thus, dived 1s by the number of samples specified in config
     frame_shift = 1/num_samples
+    
    # if (use_kaldi or torch.cuda.is_available()):
     if (use_kaldi):
         try:
@@ -27,5 +28,6 @@ def get_feat_extractor(num_samples, num_filters, use_kaldi=False):
             print("Couldn't use Kaldifeat-Extractor. Using CPU-FbankExtractor")
 
     extractor = Fbank(FbankConfig(num_filters=num_filters, frame_shift=frame_shift))
+    #extractor = Fbank(FbankConfig(num_filters=num_filters))
     return extractor
     
