@@ -24,6 +24,7 @@ def textgrid_to_list(full_path, params):
     # There are more recorded channels than participants
     # thus, not all channels are mapped to a participant
     # We focus on those that are mapped to a participant
+    
     if params['chan_id'] not in parse.chan_to_part[params['meeting_id']].keys():
         return []
 
@@ -35,9 +36,11 @@ def textgrid_to_list(full_path, params):
 
     interval_list = []
     part_id = parse.chan_to_part[params['meeting_id']][params['chan_id']]
-
+    
+    print(full_path)
     grid = textgrids.TextGrid(full_path)
     for interval in grid['laughter']:
+        
         # TODO: Change for breath laugh?!
         if str(interval.text) == 'laugh':
             seg_length = interval.xmax - interval.xmin
@@ -51,6 +54,7 @@ def textgrid_to_df(file_path):
     for filename in os.listdir(file_path):
         if filename.endswith('.TextGrid'):
             full_path = os.path.join(file_path, filename)
+            
             params = get_params_from_path(full_path)
             tot_list += textgrid_to_list(full_path,
                                          params)
@@ -253,6 +257,7 @@ def create_evaluation_df(path, out_path, use_cache=False):
                     print(f'Meeting:{meeting_id}, Threshold:{threshold}, Min-Length:{min_length}')
                     textgrid_dir = os.path.join(threshold_dir, min_length)
                     pred_laughs = textgrid_to_df(textgrid_dir)
+                
                     thr_val = threshold.replace('t_', '')
                     min_len_val = min_length.replace('l_', '')
                     out = eval_preds(pred_laughs, meeting_id, thr_val, min_len_val)

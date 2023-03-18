@@ -79,7 +79,8 @@ class EarlyStopper:
             if self.counter >= self.patience:
                 return True
         return False
-learning_rate = 0.01  # Learning rate.
+#learning_rate = 0.01  # Learning rate.
+learning_rate = 0.0001
 decay_rate = 0.9999  # Learning rate decay per minibatch.
 min_learning_rate = 0.000001  # Minimum learning rate.
 
@@ -279,8 +280,8 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
             trgs = torch.from_numpy(np.array(labs)).float().to(device)
             output = model(src).squeeze()
 
-            #criterion = nn.BCELoss()
-            criterion = nn.BCEWithLogitsLoss(pos_weight = torch.tensor([20]).to(device))
+            criterion = nn.BCELoss()
+            #criterion = nn.BCEWithLogitsLoss(pos_weight = torch.tensor([20]).to(device))
             bce_loss = criterion(output, trgs)
             preds = torch.round(output)
             # sum(preds==trg).float()/len(preds)
@@ -314,8 +315,8 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
         #if model.epoch == 0:
          #   print(output)
 
-        #criterion = nn.BCELoss()
-        criterion = nn.BCEWithLogitsLoss(pos_weight = torch.tensor([20]).to(device))
+        criterion = nn.BCELoss()
+        #criterion = nn.BCEWithLogitsLoss(pos_weight = torch.tensor([20]).to(device))
 
         preds = torch.round(output)
         #print(preds)

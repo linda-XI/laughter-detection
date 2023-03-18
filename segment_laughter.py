@@ -218,24 +218,23 @@ def calc_real_time_factor(audio_path, iterations):
         f"Average Realtime Factor over {iterations} iterations: {av_real_time_factor:.2f}")
 
 
-# load_and_pred(audio_path)
-output_time_dir = os.path.join(output_dir, 'inference_time.csv')
-# f = open(output_time_dir, 'w')
-tot_list = []
-for meet_name in audio_names:
-    full_path = os.path.join(input_dir, meet_name)
-    full_output_dir = os.path.join(output_dir, meet_name)
-    for sph_file in os.listdir(full_path):
 
-        full_sph_file = os.path.join(full_path, sph_file)
-        print(full_sph_file)
-        total_inference_time, preprocessing_time, audio_len = load_and_pred(full_sph_file, full_output_dir)
-        rtf = total_inference_time / (audio_len * 1000)
-        sub_list = [meet_name, sph_file, rtf, preprocessing_time, audio_len]
-        tot_list.append(sub_list)
-        # f.write(
-        #     f'{meet_name}:real time factor is:{rtf},preprocessing time is {preprocessing_time},audio length:{audio_len}')
-# f.close()
-cols = ['meeting_id', 'chan', 'rtf', 'preprocessing time', 'audio length']
-df = pd.DataFrame(tot_list, columns=cols)
-df.to_csv(output_time_dir, index=False)
+#output_time_dir = os.path.join(output_dir, 'inference_time.csv')
+
+#tot_list = []
+#for meet_name in audio_names:
+#    full_path = os.path.join(input_dir, meet_name)
+#    full_output_dir = os.path.join(output_dir, meet_name)
+#    for sph_file in os.listdir(full_path):
+
+#        full_sph_file = os.path.join(full_path, sph_file)
+#        print(full_sph_file)
+#        total_inference_time, preprocessing_time, audio_len = load_and_pred(full_sph_file, full_output_dir)
+#        rtf = total_inference_time / (audio_len * 1000)
+#        sub_list = [meet_name, sph_file, rtf, preprocessing_time, audio_len]
+#        tot_list.append(sub_list)
+
+#cols = ['meeting_id', 'chan', 'rtf', 'preprocessing time', 'audio length']
+#df = pd.DataFrame(tot_list, columns=cols)
+#df.to_csv(output_time_dir, index=False)
+load_and_pred('./data/icsi/speech/Bed002/chan1.sph','./overfit/test/Bed002')
