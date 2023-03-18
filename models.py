@@ -7,7 +7,7 @@ from torch import Tensor
 import math
 import copy
 from functools import partial
-from model_utils import MBConvConfig, Conv2dNormActivation, BasicBlock, Bottleneck, conv1x1
+from model_utils import MBConvConfig, Conv2dNormActivation, BasicBlock, Bottleneck, conv1x1, DW
 
 
 def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
@@ -112,54 +112,7 @@ class InvertedResidual(nn.Module):
             return self.conv(x)
 
 
-class DW(nn.Module):
-    def __init__(
-            self, inp: int, oup: int, stride: int, norm_layer: Optional[Callable[..., nn.Module]] = None
-    ) -> None:
-        super().__init__()
 
-        self.stride = stride
-        if stride not in [1, 2]:
-            raise ValueError(f"stride should be 1 or 2 instead of {stride}")
-
-        if norm_layer is None:
-            norm_layer = nn.BatchNorm2d
-
-        #         hidden_dim = int(round(inp * expand_ratio))
-        #         self.use_res_connect = self.stride == 1 and inp == oup
-
-        layers: List[nn.Module] = []
-        #         if expand_ratio != 1:
-        #             # pw
-        #             layers.append(
-        #                 Conv2dNormActivation(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer, activation_layer=nn.ReLU6)
-        #             )
-        layers.extend(
-            [
-                # dw
-                Conv2dNormActivation(
-                    inp,
-                    inp,
-                    stride=stride,
-                    groups=inp,
-                    # groups=hidden_dim,
-                    norm_layer=norm_layer,
-                    activation_layer=nn.ReLU6,
-                ),
-                # pw-linear
-                nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
-                norm_layer(oup),
-            ]
-        )
-        self.conv = nn.Sequential(*layers)
-        self.out_channels = oup
-        self._is_cn = stride > 1
-
-    def forward(self, x: Tensor) -> Tensor:
-        # if self.use_res_connect:
-        #   return x + self.conv(x)
-        # else:
-        return self.conv(x)
 
 
 class ResidualBlockNoBN(nn.Module):
@@ -843,6 +796,7 @@ class ResNet8(nn.Module):
         for b in [self.block1, self.block2]:
             b.to(device)
         self.to(device)
+
 
 class ResNet18(nn.Module):
     def __init__(

@@ -10,14 +10,14 @@ import torch
 from torch import nn, Tensor
 # from torchvision.ops import StochasticDepth
 import torch.fx
+
+
 # from ..ops.misc import Conv2dNormActivation, SqueezeExcitation
 # from ..transforms._presets import ImageClassification, InterpolationMode
 # from ..utils import _log_api_usage_once
 # from ._api import register_model, Weights, WeightsEnum
 # from ._meta import _IMAGENET_CATEGORIES
 # from ._utils import _make_divisible, _ovewrite_named_param, handle_legacy_interface
-
-
 
 
 @dataclass
@@ -33,6 +33,8 @@ class _MBConvConfig:
     @staticmethod
     def adjust_channels(channels: int, width_mult: float, min_value: Optional[int] = None) -> int:
         return _make_divisible(channels * width_mult, 8, min_value)
+
+
 def stochastic_depth(input: Tensor, p: float, mode: str, training: bool = True) -> Tensor:
     """
     Implements the Stochastic Depth from `"Deep Networks with Stochastic Depth"
@@ -89,6 +91,7 @@ class StochasticDepth(nn.Module):
         s = f"{self.__class__.__name__}(p={self.p}, mode={self.mode})"
         return s
 
+
 def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
     """
     This function is taken from the original tf repo.
@@ -104,6 +107,7 @@ def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> 
         new_v += divisor
     return new_v
 
+
 def _make_ntuple(x: Any, n: int) -> Tuple[Any, ...]:
     """
     Make n-tuple from input x. If x is an iterable, then we just convert it to tuple.
@@ -117,21 +121,22 @@ def _make_ntuple(x: Any, n: int) -> Tuple[Any, ...]:
         return tuple(x)
     return tuple(repeat(x, n))
 
+
 class ConvNormActivation(torch.nn.Sequential):
     def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        kernel_size: Union[int, Tuple[int, ...]] = 3,
-        stride: Union[int, Tuple[int, ...]] = 1,
-        padding: Optional[Union[int, Tuple[int, ...], str]] = None,
-        groups: int = 1,
-        norm_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.BatchNorm2d,
-        activation_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.ReLU,
-        dilation: Union[int, Tuple[int, ...]] = 1,
-        inplace: Optional[bool] = True,
-        bias: Optional[bool] = None,
-        conv_layer: Callable[..., torch.nn.Module] = torch.nn.Conv2d,
+            self,
+            in_channels: int,
+            out_channels: int,
+            kernel_size: Union[int, Tuple[int, ...]] = 3,
+            stride: Union[int, Tuple[int, ...]] = 1,
+            padding: Optional[Union[int, Tuple[int, ...], str]] = None,
+            groups: int = 1,
+            norm_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.BatchNorm2d,
+            activation_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.ReLU,
+            dilation: Union[int, Tuple[int, ...]] = 1,
+            inplace: Optional[bool] = True,
+            bias: Optional[bool] = None,
+            conv_layer: Callable[..., torch.nn.Module] = torch.nn.Conv2d,
     ) -> None:
 
         if padding is None:
@@ -192,20 +197,19 @@ class Conv2dNormActivation(ConvNormActivation):
     """
 
     def __init__(
-        self,
-        in_channels: int,
-        out_channels: int,
-        kernel_size: Union[int, Tuple[int, int]] = 3,
-        stride: Union[int, Tuple[int, int]] = 1,
-        padding: Optional[Union[int, Tuple[int, int], str]] = None,
-        groups: int = 1,
-        norm_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.BatchNorm2d,
-        activation_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.ReLU,
-        dilation: Union[int, Tuple[int, int]] = 1,
-        inplace: Optional[bool] = True,
-        bias: Optional[bool] = None,
+            self,
+            in_channels: int,
+            out_channels: int,
+            kernel_size: Union[int, Tuple[int, int]] = 3,
+            stride: Union[int, Tuple[int, int]] = 1,
+            padding: Optional[Union[int, Tuple[int, int], str]] = None,
+            groups: int = 1,
+            norm_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.BatchNorm2d,
+            activation_layer: Optional[Callable[..., torch.nn.Module]] = torch.nn.ReLU,
+            dilation: Union[int, Tuple[int, int]] = 1,
+            inplace: Optional[bool] = True,
+            bias: Optional[bool] = None,
     ) -> None:
-
         super().__init__(
             in_channels,
             out_channels,
@@ -220,6 +224,8 @@ class Conv2dNormActivation(ConvNormActivation):
             bias,
             torch.nn.Conv2d,
         )
+
+
 class SqueezeExcitation(torch.nn.Module):
     """
     This block implements the Squeeze-and-Excitation block from https://arxiv.org/abs/1709.01507 (see Fig. 1).
@@ -232,11 +238,11 @@ class SqueezeExcitation(torch.nn.Module):
     """
 
     def __init__(
-        self,
-        input_channels: int,
-        squeeze_channels: int,
-        activation: Callable[..., torch.nn.Module] = torch.nn.ReLU,
-        scale_activation: Callable[..., torch.nn.Module] = torch.nn.Sigmoid,
+            self,
+            input_channels: int,
+            squeeze_channels: int,
+            activation: Callable[..., torch.nn.Module] = torch.nn.ReLU,
+            scale_activation: Callable[..., torch.nn.Module] = torch.nn.Sigmoid,
     ) -> None:
         super().__init__()
         self.avgpool = torch.nn.AdaptiveAvgPool2d(1)
@@ -260,16 +266,16 @@ class SqueezeExcitation(torch.nn.Module):
 class MBConvConfig(_MBConvConfig):
     # Stores information listed at Table 1 of the EfficientNet paper & Table 4 of the EfficientNetV2 paper
     def __init__(
-        self,
-        expand_ratio: float,
-        kernel: int,
-        stride: int,
-        input_channels: int,
-        out_channels: int,
-        num_layers: int,
-        width_mult: float = 1.0,
-        depth_mult: float = 1.0,
-        block: Optional[Callable[..., nn.Module]] = None,
+            self,
+            expand_ratio: float,
+            kernel: int,
+            stride: int,
+            input_channels: int,
+            out_channels: int,
+            num_layers: int,
+            width_mult: float = 1.0,
+            depth_mult: float = 1.0,
+            block: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         input_channels = self.adjust_channels(input_channels, width_mult)
         out_channels = self.adjust_channels(out_channels, width_mult)
@@ -286,18 +292,20 @@ class MBConvConfig(_MBConvConfig):
 class FusedMBConvConfig(_MBConvConfig):
     # Stores information listed at Table 4 of the EfficientNetV2 paper
     def __init__(
-        self,
-        expand_ratio: float,
-        kernel: int,
-        stride: int,
-        input_channels: int,
-        out_channels: int,
-        num_layers: int,
-        block: Optional[Callable[..., nn.Module]] = None,
+            self,
+            expand_ratio: float,
+            kernel: int,
+            stride: int,
+            input_channels: int,
+            out_channels: int,
+            num_layers: int,
+            block: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         if block is None:
             block = FusedMBConv
         super().__init__(expand_ratio, kernel, stride, input_channels, out_channels, num_layers, block)
+
+
 class SqueezeExcitation(torch.nn.Module):
     """
     This block implements the Squeeze-and-Excitation block from https://arxiv.org/abs/1709.01507 (see Fig. 1).
@@ -310,11 +318,11 @@ class SqueezeExcitation(torch.nn.Module):
     """
 
     def __init__(
-        self,
-        input_channels: int,
-        squeeze_channels: int,
-        activation: Callable[..., torch.nn.Module] = torch.nn.ReLU,
-        scale_activation: Callable[..., torch.nn.Module] = torch.nn.Sigmoid,
+            self,
+            input_channels: int,
+            squeeze_channels: int,
+            activation: Callable[..., torch.nn.Module] = torch.nn.ReLU,
+            scale_activation: Callable[..., torch.nn.Module] = torch.nn.Sigmoid,
     ) -> None:
         super().__init__()
 
@@ -338,11 +346,11 @@ class SqueezeExcitation(torch.nn.Module):
 
 class MBConv(nn.Module):
     def __init__(
-        self,
-        cnf: MBConvConfig,
-        stochastic_depth_prob: float,
-        norm_layer: Callable[..., nn.Module],
-        se_layer: Callable[..., nn.Module] = SqueezeExcitation,
+            self,
+            cnf: MBConvConfig,
+            stochastic_depth_prob: float,
+            norm_layer: Callable[..., nn.Module],
+            se_layer: Callable[..., nn.Module] = SqueezeExcitation,
     ) -> None:
         super().__init__()
 
@@ -405,10 +413,10 @@ class MBConv(nn.Module):
 
 class FusedMBConv(nn.Module):
     def __init__(
-        self,
-        cnf: FusedMBConvConfig,
-        stochastic_depth_prob: float,
-        norm_layer: Callable[..., nn.Module],
+            self,
+            cnf: FusedMBConvConfig,
+            stochastic_depth_prob: float,
+            norm_layer: Callable[..., nn.Module],
     ) -> None:
         super().__init__()
 
@@ -463,6 +471,7 @@ class FusedMBConv(nn.Module):
                 result += input
             return result
 
+
 class EfficientNet(nn.Module):
     def __init__(
             self,
@@ -484,7 +493,6 @@ class EfficientNet(nn.Module):
             last_channel (int): The number of channels on the penultimate layer
         """
         super().__init__()
-
 
         if not inverted_residual_setting:
             raise ValueError("The inverted_residual_setting should not be empty")
@@ -578,23 +586,20 @@ class EfficientNet(nn.Module):
 
 
 def _efficientnet(
-    inverted_residual_setting: Sequence[Union[MBConvConfig, FusedMBConvConfig]],
-    dropout: float,
-    last_channel: Optional[int],
-    progress: bool,
-    **kwargs: Any,
+        inverted_residual_setting: Sequence[Union[MBConvConfig, FusedMBConvConfig]],
+        dropout: float,
+        last_channel: Optional[int],
+        progress: bool,
+        **kwargs: Any,
 ) -> EfficientNet:
-
     model = EfficientNet(inverted_residual_setting, dropout, last_channel=last_channel, **kwargs)
-
-
 
     return model
 
 
 def _efficientnet_conf(
-    arch: str,
-    **kwargs: Any,
+        arch: str,
+        **kwargs: Any,
 ) -> Tuple[Sequence[Union[MBConvConfig, FusedMBConvConfig]], Optional[int]]:
     inverted_residual_setting: Sequence[Union[MBConvConfig, FusedMBConvConfig]]
     if arch.startswith("efficientnet_b"):
@@ -648,6 +653,54 @@ def _efficientnet_conf(
 
 
 ############for resnet
+class DW(nn.Module):
+    def __init__(
+            self, inp: int, oup: int, stride: int, norm_layer: Optional[Callable[..., nn.Module]] = None, groups: int = 1,
+    ) -> None:
+        super().__init__()
+
+        self.stride = stride
+        if stride not in [1, 2]:
+            raise ValueError(f"stride should be 1 or 2 instead of {stride}")
+
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+
+        #         hidden_dim = int(round(inp * expand_ratio))
+        #         self.use_res_connect = self.stride == 1 and inp == oup
+
+        layers: List[nn.Module] = []
+        #         if expand_ratio != 1:
+        #             # pw
+        #             layers.append(
+        #                 Conv2dNormActivation(inp, hidden_dim, kernel_size=1, norm_layer=norm_layer, activation_layer=nn.ReLU6)
+        #             )
+        layers.extend(
+            [
+                # dw
+                Conv2dNormActivation(
+                    inp,
+                    inp,
+                    stride=stride,
+                    groups=inp,
+                    # groups=hidden_dim,
+                    norm_layer=norm_layer,
+                    activation_layer=nn.ReLU6,
+                ),
+                # pw-linear
+                nn.Conv2d(inp, oup, 1, 1, 0, bias=False),
+                norm_layer(oup),
+            ]
+        )
+        self.conv = nn.Sequential(*layers)
+        self.out_channels = oup
+        self._is_cn = stride > 1
+
+    def forward(self, x: Tensor) -> Tensor:
+        # if self.use_res_connect:
+        #   return x + self.conv(x)
+        # else:
+        return self.conv(x)
 
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
@@ -673,15 +726,15 @@ class BasicBlock(nn.Module):
     expansion: int = 1
 
     def __init__(
-        self,
-        inplanes: int,
-        planes: int,
-        stride: int = 1,
-        downsample: Optional[nn.Module] = None,
-        groups: int = 1,
-        base_width: int = 64,
-        dilation: int = 1,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+            self,
+            inplanes: int,
+            planes: int,
+            stride: int = 1,
+            downsample: Optional[nn.Module] = None,
+            groups: int = 1,
+            base_width: int = 64,
+            dilation: int = 1,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         super().__init__()
         if norm_layer is None:
@@ -728,15 +781,15 @@ class Bottleneck(nn.Module):
     expansion: int = 4
 
     def __init__(
-        self,
-        inplanes: int,
-        planes: int,
-        stride: int = 1,
-        downsample: Optional[nn.Module] = None,
-        groups: int = 1,
-        base_width: int = 64,
-        dilation: int = 1,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+            self,
+            inplanes: int,
+            planes: int,
+            stride: int = 1,
+            downsample: Optional[nn.Module] = None,
+            groups: int = 1,
+            base_width: int = 64,
+            dilation: int = 1,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         super().__init__()
         if norm_layer is None:
@@ -776,3 +829,112 @@ class Bottleneck(nn.Module):
         return out
 
 
+class BasicBlock_DW(nn.Module):
+    expansion: int = 1
+
+    def __init__(
+            self,
+            inplanes: int,
+            planes: int,
+            stride: int = 1,
+            downsample: Optional[nn.Module] = None,
+            groups: int = 1,
+            base_width: int = 64,
+            dilation: int = 1,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
+    ) -> None:
+        super().__init__()
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+        if groups != 1 or base_width != 64:
+            raise ValueError("BasicBlock only supports groups=1 and base_width=64")
+        if dilation > 1:
+            raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
+        block = DW
+        # Both self.conv1 and self.downsample layers downsample the input when stride != 1
+
+        self.conv1 = block(inplanes, planes, stride, norm_layer=norm_layer)
+
+        self.relu = nn.ReLU(inplace=True)
+
+        self.conv2 = block(planes, planes, 1, norm_layer=norm_layer)
+
+        self.downsample = downsample
+        self.stride = stride
+
+    def forward(self, x: Tensor) -> Tensor:
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+
+        if self.downsample is not None:
+            identity = self.downsample(x)
+
+        out += identity
+        out = self.relu(out)
+
+        return out
+
+
+class Bottleneck_DW(nn.Module):
+    # Bottleneck in torchvision places the stride for downsampling at 3x3 convolution(self.conv2)
+    # while original implementation places the stride at the first 1x1 convolution(self.conv1)
+    # according to "Deep residual learning for image recognition" https://arxiv.org/abs/1512.03385.
+    # This variant is also known as ResNet V1.5 and improves accuracy according to
+    # https://ngc.nvidia.com/catalog/model-scripts/nvidia:resnet_50_v1_5_for_pytorch.
+
+    expansion: int = 4
+
+    def __init__(
+            self,
+            inplanes: int,
+            planes: int,
+            stride: int = 1,
+            downsample: Optional[nn.Module] = None,
+            groups: int = 1,
+            base_width: int = 64,
+            dilation: int = 1,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
+    ) -> None:
+        super().__init__()
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+        width = int(planes * (base_width / 64.0)) * groups
+        block = DW
+        # Both self.conv2 and self.downsample layers downsample the input when stride != 1
+        self.conv1 = conv1x1(inplanes, width)
+        self.bn1 = norm_layer(width)
+        self.conv2 = conv3x3(width, width, stride, groups, dilation)
+        self.bn2 = norm_layer(width)
+        self.conv3 = conv1x1(width, planes * self.expansion)
+        self.bn3 = norm_layer(planes * self.expansion)
+        self.relu = nn.ReLU(inplace=True)
+        self.downsample = downsample
+        self.stride = stride
+
+    def forward(self, x: Tensor) -> Tensor:
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+
+        out = self.conv3(out)
+        out = self.bn3(out)
+
+        if self.downsample is not None:
+            identity = self.downsample(x)
+
+        out += identity
+        out = self.relu(out)
+
+        return out
