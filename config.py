@@ -31,7 +31,7 @@ MODEL_MAP['resnet8'] = {
     'model': models.ResNet8,
     'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
     'log_frequency': 900,
-    'linear_layer_size': 48, # for new features of shape (40,100)
+    'linear_layer_size': 960, # for new features of shape (40,100)
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
     'filter_sizes': [32,16,16,16],
 }
