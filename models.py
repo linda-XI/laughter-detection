@@ -7,7 +7,7 @@ from torch import Tensor
 import math
 import copy
 from functools import partial
-from model_utils import MBConvConfig, Conv2dNormActivation, BasicBlock, Bottleneck, conv1x1, DW
+from model_utils import MBConvConfig, Conv2dNormActivation, BasicBlock, Bottleneck, conv1x1, DW, BasicBlock_DW
 
 
 def _make_divisible(v: float, divisor: int, min_value: Optional[int] = None) -> int:
