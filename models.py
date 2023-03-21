@@ -811,13 +811,14 @@ class ResNet18(nn.Module):
             norm_layer: Optional[Callable[..., nn.Module]] = None,
             dropout_rate=0.5,
             linear_layer_size=None,
-            filter_sizes=None
+            filter_sizes=[64, 128, 256, 512]
     ) -> None:
         super(ResNet18, self).__init__()
 
         self.global_step = 0
         self.epoch = 0
         self.best_val_loss = np.inf
+        self.filter_sizes = filter_sizes
 
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -840,12 +841,12 @@ class ResNet18(nn.Module):
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
+        self.layer1 = self._make_layer(block, filter_sizes[0], layers[0])
+        self.layer2 = self._make_layer(block, filter_sizes[1], layers[1], stride=2, dilate=replace_stride_with_dilation[0])
+        self.layer3 = self._make_layer(block, filter_sizes[2], layers[2], stride=2, dilate=replace_stride_with_dilation[1])
+        self.layer4 = self._make_layer(block, filter_sizes[3], layers[3], stride=2, dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(filter_sizes[3] * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

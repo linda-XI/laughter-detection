@@ -469,8 +469,13 @@ def run_epoch(model, mode, device, iterator, checkpoint_dir, epoch_num, optimize
 print("Initializing model...")
 device = torch.device(torch_device if torch.cuda.is_available() else 'cpu')
 print("Using device", device)
-model = config['model'](dropout_rate=dropout_rate,
-                        linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'])
+if args.config == 'mobilenet_v2':
+    model = config['model'](dropout_rate=dropout_rate,
+                            linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'],
+                            inverted_residual_setting=['inverted_residual_setting'])
+else:
+    model = config['model'](dropout_rate=dropout_rate,
+                            linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'])
 model.set_device(device)
 torch_utils.count_parameters(model)
 model.apply(torch_utils.init_weights)
