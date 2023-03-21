@@ -65,6 +65,7 @@ MODEL_MAP['resnet18'] = {
     'log_frequency': 900,
     'linear_layer_size': 48, # for new features of shape (40,100)
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    # use to change width of model
     'filter_sizes': [64,32,16,16],
 }
 
@@ -104,7 +105,16 @@ MODEL_MAP['mobilenet_v2'] = {
     'log_frequency': 200,
     'num_classes': 1,
     'width_mult': 1.0,
-    'inverted_residual_setting': None,
+    'inverted_residual_setting': [
+                # t, c, n, s
+                [1, 16, 1, 1],
+                [6, 24, 2, 2],
+                [6, 32, 3, 2],
+                [6, 64, 4, 2],
+                [6, 96, 3, 1],
+                [6, 160, 3, 2],
+                [6, 320, 1, 1],
+            ],
     'round_nearest': 8,
     'block': None,
     'norm_layer': None,

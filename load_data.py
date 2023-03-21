@@ -52,3 +52,24 @@ def create_inference_dataloader(audio_path):
     dataset = InferenceDataset(feats_all)
     dataloader = DataLoader(dataset, batch_size=32)
     return dataloader
+
+
+def create_time_dataloader(audio_path):
+    '''
+    Create time dataloader for audio_file passed using `audio_path`.
+    Loads the audio as one single cut and creates a feature representation of it.
+    These features are then used to created an Inference Dataset from which the
+    features for small windows can be read one by one
+    batch size is 1
+    '''
+    rec = Recording.from_file(audio_path)
+    cut = MonoCut(id='inference-cut', start=0.0, duration=60, channel=0, recording=rec)
+
+    extractor = get_feat_extractor(num_samples=cfg.FEAT['num_samples'], num_filters=cfg.FEAT['num_filters'])
+    # f2 = Fbank(FbankConfig(num_filters=128, frame_shift=0.02275))
+    feats_all = cut.compute_features(extractor)
+
+    # Construct a Pytorch Dataset class for inference using the
+    dataset = InferenceDataset(feats_all)
+    dataloader = DataLoader(dataset, batch_size=1)
+    return dataloader
