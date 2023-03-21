@@ -174,7 +174,7 @@ def run_training_loop(n_epochs, model, device, checkpoint_dir,
                       verbose=True):
 
     val_loss_list = []
-    early_stopper = EarlyStopper(patience=3, min_delta=0.005)
+    early_stopper = EarlyStopper(patience=7, min_delta=0.005)
     for epoch in range(n_epochs):
         print(f'run epoch: {epoch}')
         start_time = time.time()
