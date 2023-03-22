@@ -69,6 +69,17 @@ MODEL_MAP['resnet18'] = {
     'filter_sizes': [64,128,256,512],
 }
 
+MODEL_MAP['resnet18_small'] = {
+    'batch_size': 32,
+    'model': models.ResNet18,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    # use to change width of model
+    'filter_sizes': [64,32,16,16],
+}
+
 MODEL_MAP['resnet32'] = {
     'batch_size': 32,
     'model': models.ResNet32,
