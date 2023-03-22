@@ -43,13 +43,13 @@ MODEL_MAP['resnet18_dw'] = {
     'log_frequency': 900,
     'linear_layer_size': 48, # for new features of shape (40,100)
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
-    'filter_sizes': [64,32,16,16],
+    'filter_sizes': [64,128,256,512],
 }
 
 
-MODEL_MAP['resnet8'] = {
+MODEL_MAP['resnet8_baseline'] = {
     'batch_size': 32,
-    'model': models.ResNet8,
+    'model': models.ResNet8_baseline,
     'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
     'log_frequency': 900,
     'linear_layer_size': 960, # for new features of shape (40,100)
@@ -57,6 +57,16 @@ MODEL_MAP['resnet8'] = {
     'filter_sizes': [32,16,16,16],
 }
 
+MODEL_MAP['resnet10'] = {
+    'batch_size': 32,
+    'model': models.ResNet10,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    # use to change width of model
+    'filter_sizes': [64,128,256,512],
+}
 
 MODEL_MAP['resnet18'] = {
     'batch_size': 32,
@@ -78,6 +88,17 @@ MODEL_MAP['resnet18_small'] = {
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
     # use to change width of model
     'filter_sizes': [64,32,16,16],
+}
+
+MODEL_MAP['resnet18_big'] = {
+    'batch_size': 32,
+    'model': models.ResNet18,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    # use to change width of model
+    'filter_sizes': [64,128,512,512],
 }
 
 MODEL_MAP['resnet32'] = {
