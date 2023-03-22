@@ -66,7 +66,7 @@ MODEL_MAP['resnet18'] = {
     'linear_layer_size': 48, # for new features of shape (40,100)
     # 'linear_layer_size': 64, # original value for features of shape (44,128)
     # use to change width of model
-    'filter_sizes': [64,32,16,16],
+    'filter_sizes': [64,128,256,512],
 }
 
 MODEL_MAP['resnet32'] = {
