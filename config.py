@@ -46,6 +46,16 @@ MODEL_MAP['resnet18_dw'] = {
     'filter_sizes': [64,128,256,512],
 }
 
+MODEL_MAP['resnet18_small_dw'] = {
+    'batch_size': 32,
+    'model': models.ResNet18_DW,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 900,
+    'linear_layer_size': 48, # for new features of shape (40,100)
+    # 'linear_layer_size': 64, # original value for features of shape (44,128)
+    'filter_sizes': [64,32,16,16],
+}
+
 
 MODEL_MAP['resnet8_baseline'] = {
     'batch_size': 32,
@@ -146,6 +156,58 @@ MODEL_MAP['mobilenet_v2'] = {
                 [6, 96, 3, 1],
                 [6, 160, 3, 2],
                 [6, 320, 1, 1],
+            ],
+    'round_nearest': 8,
+    'block': None,
+    'norm_layer': None,
+    'dropout_rate': 0.2,
+    #useless params
+    'linear_layer_size': 128,
+    'filter_sizes': [128,64,32,32],
+}
+
+MODEL_MAP['mobilenet_small_n'] = {
+    'batch_size': 32,
+    'model': models.MobileNetV2,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 200,
+    'num_classes': 1,
+    'width_mult': 1.0,
+    'inverted_residual_setting': [
+                # t, c, n, s
+                [1, 16, 1, 1],
+                [6, 24, 2, 2],
+                [6, 32, 2, 2],
+                [6, 64, 2, 2],
+                [6, 96, 2, 1],
+                [6, 160, 1, 2],
+                [6, 320, 1, 1],
+            ],
+    'round_nearest': 8,
+    'block': None,
+    'norm_layer': None,
+    'dropout_rate': 0.2,
+    #useless params
+    'linear_layer_size': 128,
+    'filter_sizes': [128,64,32,32],
+}
+
+MODEL_MAP['mobilenet_small_t'] = {
+    'batch_size': 32,
+    'model': models.MobileNetV2,
+    'val_data_text_path': './data/switchboard/val/switchboard_val_data.txt',
+    'log_frequency': 200,
+    'num_classes': 1,
+    'width_mult': 1.0,
+    'inverted_residual_setting': [
+                # t, c, n, s
+                [1, 16, 1, 1],
+                [2, 24, 2, 2],
+                [2, 32, 3, 2],
+                [2, 64, 4, 2],
+                [2, 96, 3, 1],
+                [2, 160, 3, 2],
+                [2, 320, 1, 1],
             ],
     'round_nearest': 8,
     'block': None,
