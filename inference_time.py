@@ -117,13 +117,13 @@ output_file = model_name + '_' + 'inference_time.csv'
 output_time_dir = os.path.join(output_dir, output_file)
 
 tot_list = []
-iterate = 3
+iterate = 10
 total_rft = 0
 total_preprocessing = 0
 total_audio_len = 0
 print('la')
 for i in range(iterate):
-    print(i)
+    
     total_inference_time, preprocessing_time, audio_len = load_and_pred('./data/icsi/speech/Bed002/chan1.sph')
     rtf = total_inference_time / (audio_len * 1000)
     total_audio_len = total_audio_len + audio_len
