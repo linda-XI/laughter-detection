@@ -28,14 +28,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str,
                     default='checkpoints/in_use/resnet_with_augmentation')
 parser.add_argument('--config', type=str, default='resnet_with_augmentation')
-parser.add_argument('--output_dir', type=str, default=None)
-parser.add_argument('--model_name', type=str, default='')
+
+
 args = parser.parse_args()
 
-model_path = args.model_path
+
 config = config.MODEL_MAP[args.config]
-output_dir = args.output_dir
-model_name = args.model_name
+
+
 # Turn comma-separated parameter strings into list of floats
 
 
