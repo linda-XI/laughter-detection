@@ -61,7 +61,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device {device}")
 
 # Load the Model
-if args.config.startwith('mobile'):
+if args.config.startswith('mobile'):
     model = config['model'](dropout_rate=0.0,
                             linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'],
                             inverted_residual_setting=['inverted_residual_setting'])
