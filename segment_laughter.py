@@ -64,7 +64,7 @@ print(f"Using device {device}")
 if args.config.startswith('mobile'):
     model = config['model'](dropout_rate=0.0,
                             linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'],
-                            inverted_residual_setting=['inverted_residual_setting'])
+                            inverted_residual_setting=config['inverted_residual_setting'])
 else:
     model = config['model'](
     dropout_rate=0.0, linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'])
