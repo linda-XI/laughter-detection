@@ -77,7 +77,7 @@ def load_and_pred(audio_path):
     Loads audio, runs prediction and outputs results according to flag-settings (e.g. TextGrid or Audio)
     '''
     start_time = time.time()  # Start measuring time
-    starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+    #starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
     batch_time_list = []
     inference_generator = load_data.create_time_dataloader(audio_path)
     preprocessing_time = time.time() - start_time  # stop measuring time
@@ -89,11 +89,14 @@ def load_and_pred(audio_path):
         model_inputs = model_inputs[:, None, :, :]  # add additional dimension
         x = model_inputs.float().to(device)
 
-        starter.record()
+        #starter.record()
+        starter = time.time()
         preds = model(x).cpu().detach().numpy().squeeze()
-        ender.record()
-        torch.cuda.synchronize()
-        curr_time = starter.elapsed_time(ender)
+        #ender.record()
+        #torch.cuda.synchronize()
+        ender = time.time()
+        #curr_time = starter.elapsed_time(ender)
+        curr_time = ender - starter
         batch_time_list.append(curr_time)
 
         if len(preds.shape) == 0:
