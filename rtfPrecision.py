@@ -14,11 +14,11 @@ y2=[0.587, 0.59, 0.54, 0.551, 0.433, 0.455, 0.56, 0.557]
 # x3=[30,50,70,90,105,114,128,137,147,159,170,180,190,200,210,230,243,259,284,297,311]
 # y3=[48,48,48,48,66,173,351,472,586,712,804,899,994,1094,1198,1360,1458,1578,1734,1797,1892]
 # x=np.arange(20,350)
-l1=plt.plot(x1,y1,'r--')
-# l2=plt.plot(x2,y2,'g--',label='type2')
+l1=plt.plot(x1,y1,'r--',label='depth')
+l2=plt.plot(x2,y2,'g--',label='rest')
 # l3=plt.plot(x3,y3,'b--',label='type3')
 # plt.plot(x1,y1,'ro-',x2,y2,'g+-',x3,y3,'b^-')
-plt.plot(x1,y1,'ro-')
+plt.plot(x1,y1,'ro-',x2,y2,'g+-')
 plt.title('CPU rtf vs F1')
 plt.xlabel('CPU rtf')
 plt.ylabel('F1')
