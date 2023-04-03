@@ -105,7 +105,7 @@ def load_and_pred(audio_path):
             preds = list(preds)
         probs += preds
     probs = np.array(probs)
-
+    #in seconds
     file_length = audio_utils.get_audio_length(audio_path)
 
     # Removed because it can output probs < 0
@@ -113,7 +113,7 @@ def load_and_pred(audio_path):
 
     # Get a list of instance for each setting passed in  
 
-    return sum(batch_time_list), preprocessing_time, file_length
+    return sum(batch_time_list), preprocessing_time, 60
 
 
 output_file = model_name + '_' + 'inference_time.csv'
@@ -142,3 +142,4 @@ cols = ['rtf', 'preprocessing time', 'audio length', 'iter']
 df = pd.DataFrame(tot_list, columns=cols)
 df.to_csv(output_time_dir, index=False)
 # load_and_pred('./data/icsi/speech/Bed002/chan1.sph','./overfit/test/Bed002')
+

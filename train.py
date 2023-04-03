@@ -79,8 +79,8 @@ class EarlyStopper:
             if self.counter >= self.patience:
                 return True
         return False
-#learning_rate = 0.01  # Learning rate.
-learning_rate = 0.0001 #mobilenet
+learning_rate = 0.01  # Learning rate.
+#learning_rate = 0.0001 #mobilenet
 decay_rate = 0.9999  # Learning rate decay per minibatch.
 min_learning_rate = 0.000001  # Minimum learning rate.
 

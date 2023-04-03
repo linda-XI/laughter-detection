@@ -18,10 +18,11 @@ import scipy.io.wavfile
 from tqdm import tqdm
 import tgt
 import load_data
-from thop import profile
+from thop import profile, clever_format
 sys.path.append('./utils/')
 import torch_utils
 import audio_utils
+from torchstat import stat
 
 parser = argparse.ArgumentParser()
 
@@ -51,6 +52,11 @@ model = config['model'](
     dropout_rate=0.0, linear_layer_size=config['linear_layer_size'], filter_sizes=config['filter_sizes'])
 model.set_device(device)
 
-imput1 = torch.randn(32,1,100,44)
-flops,params = profile(model, inputs = (imput1,))
-print('FLOPs =' +str(flops/1000**3)+'G')
+imputa = torch.randn(32,1,100,44)
+print('la')
+flops,total_params = profile(model, inputs = (imputa,))
+macs, params = clever_format([flops,total_params]) 
+#print('FLOPs =' +str(flops/1000**3)+'G')
+#print(stat(model,(1,100,44)))
+print(macs,params)
+
