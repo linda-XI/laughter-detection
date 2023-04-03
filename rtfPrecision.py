@@ -6,7 +6,7 @@ import config as cfg
 import os
 import seaborn as sns
 from pathlib import Path
-
+print('start')
 x1=[0.001563, 0.00315, 0.00609, 0.006183, 0.0042, 0.001063, 0.002702, 0.001433, 0.001175, 0.002094, 0.026296, 0.03346]
 y1=[0.56, 0.55, 0.6, 0.6, 0.587, 0.59, 0.54, 0.551, 0.433, 0.455, 0.56, 0.557]
 # x2=[31,52,73,92,101,112,126,140,153,175,186,196,215,230,240,270,288,300]
@@ -22,8 +22,10 @@ plt.plot(x1,y1,'ro-')
 plt.title('CPU rtf vs F1')
 plt.xlabel('CPU rtf')
 plt.ylabel('F1')
-plt.legend()
+#plt.legend()
+
 plt.tight_layout()
 plot_file = os.path.join('./plots', 'rtfF1.png' )
+print('mkdir')
 Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
 plt.savefig(plot_file)
