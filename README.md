@@ -24,9 +24,9 @@ The following list outlines which parts of the repository belong to each of them
     - `inference_time.py(from scratch)`: functions to calculate the inference time of models
     - `rftPricision.py(from scratch)`: functions to draw diagram for accuracy and speed metrics
 
-- **Data Pipeline** (adapted) - also see [diagram](#diagram-of-the-data-pipeline):
-    - `compute_features`(adapted):  computes feature representing the whole corpus and specific subsets of the ICSI corpus
-    - `create_data_df.py`(adapted): creates a dataframe representing training, development and test-set 
+- **Data Pipeline** (adapted) 
+    - `compute_features(adapted)`:  computes feature representing the whole corpus and specific subsets of the ICSI corpus
+    - `create_data_df.py(adapted)`: creates a dataframe representing training, development and test-set 
 
 - **Training Code**(adapted):
     - `models.py(adapted)` : defines the model architecture
