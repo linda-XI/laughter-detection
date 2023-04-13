@@ -19,23 +19,23 @@ The following list outlines which parts of the repository belong to each of them
     - `analysis`
         - `transcript_parsing/parse.py` +`preprocess.py(adapted)`: parsing and preprocessing the ICSI transcripts
         - `analyse.py(adapted)`: main function, that parses and evaluates predictions from .TextGrid files output by the model
-    - `visualise.py`(adapted): functions for visualising model performance (incl. prec-recall curve and confusion matrix)
-    - `flops.py`(from scratch): functions to calculate the FLOPs of models
-    - `inference_time.py`(from scratch): functions to calculate the inference time of models
-    - `rftPricision.py`(from scratch): functions to draw diagram for accuracy and speed metrics
+    - `visualise.py(adapted)`: functions for visualising model performance (incl. prec-recall curve and confusion matrix)
+    - `flops.py(from scratch)`: functions to calculate the FLOPs of models
+    - `inference_time.py(from scratch)`: functions to calculate the inference time of models
+    - `rftPricision.py(from scratch)`: functions to draw diagram for accuracy and speed metrics
 
 - **Data Pipeline** (adapted) - also see [diagram](#diagram-of-the-data-pipeline):
     - `compute_features`(adapted):  computes feature representing the whole corpus and specific subsets of the ICSI corpus
     - `create_data_df.py`(adapted): creates a dataframe representing training, development and test-set 
 
 - **Training Code**(adapted):
-    - `models.py` (adapted): defines the model architecture
+    - `models.py(adapted)` : defines the model architecture
     - `model_utils.py(from scratch)`: defines model architecture
-    - `train.py` (adapted): main training code
-    - `segment_laughter.py`(adpated) + `laugh_segmenter.py(unmodified)` : inference code to run laughter detection on audio files
-    - `datasets.py`(unmodified) + `load_data.py` (adapted): the new LAD (Laugh Activity Detection) Dataset + new inference Dataset and code for their creation
+    - `train.py(adapted)` : main training code
+    - `segment_laughter.py(adapted)` + `laugh_segmenter.py(unmodified)` : inference code to run laughter detection on audio files
+    - `datasets.py(unmodified)` + `load_data.py(adapted)` : the new LAD (Laugh Activity Detection) Dataset + new inference Dataset and code for their creation
 
 - **Misc**:
-    - `config.py` (adapted): configurations for different parts of the pipeline
+    - `config.py(adapted)` : configurations for different parts of the pipeline
     - `results.zip` (N/A): contains the model predictions from experiments presented in my thesis
 
