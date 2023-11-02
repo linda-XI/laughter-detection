@@ -47,10 +47,39 @@ def textgrid_to_list(full_path, params):
             interval_list.append([params['meeting_id'], part_id, params['chan_id'], interval.xmin,
                                   interval.xmax, seg_length, params['threshold'], params['min_len'], str(interval.text)])
     return interval_list
+##############################################################################################################################
+def textgrid_to_list_notLaugh(full_path, params):
+    # There are more recorded channels than participants
+    # thus, not all channels are mapped to a participant
+    # We focus on those that are mapped to a participant
+    
+    if params['chan_id'] not in parse.chan_to_part[params['meeting_id']].keys():
+        return []
 
+    # If file is empty -> no predictions
+    if os.stat(full_path).st_size == 0:
+        print(f"WARNING: Found an empty .TextGrid file. This usually shouldn't happen.  \
+        Did something go wrong with evaluation for {params['meeting_id']: params['chan_id']}")
+        return []
+
+    interval_list = []
+    part_id = parse.chan_to_part[params['meeting_id']][params['chan_id']]
+    
+    print(full_path)
+    grid = textgrids.TextGrid(full_path)
+    for interval in grid['laughter']:
+        
+        # 
+        if str(interval.text) == '':
+            seg_length = interval.xmax - interval.xmin
+            interval_list.append([params['meeting_id'], part_id, params['chan_id'], interval.xmin,
+                                  interval.xmax, seg_length, params['threshold'], params['min_len'], str(interval.text)])
+    return interval_list
+##############################################################################################################
 
 def textgrid_to_df(file_path):
     tot_list = []
+    tot_list_notLaugh = []
     for filename in os.listdir(file_path):
         if filename.endswith('.TextGrid'):
             full_path = os.path.join(file_path, filename)
@@ -58,11 +87,14 @@ def textgrid_to_df(file_path):
             params = get_params_from_path(full_path)
             tot_list += textgrid_to_list(full_path,
                                          params)
+            tot_list_notLaugh += textgrid_to_list_notLaugh(full_path,
+                                         params)
 
     cols = ['meeting_id', 'part_id', 'chan', 'start',
             'end', 'length', 'threshold', 'min_len', 'laugh_type']
-    df = pd.DataFrame(tot_list, columns=cols)
-    return df
+    df_laugh = pd.DataFrame(tot_list, columns=cols)
+    df_notLaugh = pd.DataFrame(tot_list_notLaugh, columns=cols)
+    return df_laugh, df_notLaugh
 
 
 def get_params_from_path(path):
@@ -235,17 +267,18 @@ def eval_preds(pred_per_meeting_df, meeting_id, threshold, min_len, print_stats=
            tot_transc_laugh_time, num_of_pred_laughs, num_of_VALID_pred_laughs, num_of_tranc_laughs,
            tot_fp_speech_time, tot_fp_noise_time, tot_fp_silence_time]
 
-def create_evaluation_df(path, out_path, use_cache=False):
+def create_evaluation_df(path, out_laugh_path, out_notLaugh_path use_cache=False):
     """
     Creates a dataframe summarising evaluation metrics per meeting for each parameter-set
     """
-    if use_cache and os.path.isfile(f'{os.path.dirname(__file__)}/.cache/eval_df.csv'):
+    if use_cache and os.path.isfile(f'{os.path.dirname(__file__)}/.cache/eval_df.csv') and os.path.isfile(f'{os.path.dirname(__file__)}/.cache/eval_notLaugh_df.csv'):
         print("-----------------------------------------")
         print("NO NEW EVALUATION - USING CACHED VERSION")
         print("-----------------------------------------")
-        eval_df = pd.read_csv(out_path)
+        eval_laugh_df = pd.read_csv(out_laugh_path)
     else:
-        all_evals = []
+        all_evals_laugh = []
+        all_evals_notLaugh = []
         print('Calculating metrics for every meeting for every parameter-set:')
         for meeting in os.listdir(path):
             #print(f'Evaluating meeting {meeting}...')
@@ -256,29 +289,40 @@ def create_evaluation_df(path, out_path, use_cache=False):
                 for min_length in os.listdir(threshold_dir):
                     print(f'Meeting:{meeting_id}, Threshold:{threshold}, Min-Length:{min_length}')
                     textgrid_dir = os.path.join(threshold_dir, min_length)
-                    pred_laughs = textgrid_to_df(textgrid_dir)
+                    pred_laughs, pred_notLaughs = textgrid_to_df(textgrid_dir)
                 
                     thr_val = threshold.replace('t_', '')
                     min_len_val = min_length.replace('l_', '')
-                    out = eval_preds(pred_laughs, meeting_id, thr_val, min_len_val)
-                    all_evals.append(out)
+                    
+                    out_laugh = eval_preds(pred_laughs, meeting_id, thr_val, min_len_val)
+                    #TODO  is eval_preds suitable for not laugh?
+                    out_notLaugh = eval_preds(pred_notLaughs, meeting_id, thr_val, min_len_val)
+                    
+                    all_evals_laugh.append(out_laugh)
+                    all_evals_notLaugh.append(out_notLaugh)
                     # Log progress
-
-        cols = ['meeting', 'threshold', 'min_len', 'precision', 'recall',
+        #---tot_fp_speech_time: actual speech, predict laugh---#
+        cols_laugh = ['meeting', 'threshold', 'min_len', 'precision', 'recall',
                 'corr_pred_time', 'tot_pred_time', 'tot_transc_laugh_time', 'num_of_pred_laughs', 'valid_pred_laughs', 'num_of_transc_laughs',
                 'tot_fp_speech_time', 'tot_fp_noise_time', 'tot_fp_silence_time']
+        #---fp_laugh: actual laught, predict notlaugh; tot_tp_speech_time:actual speech, predict not laugh---#
+        cols_notLaugh = ['meeting', 'threshold', 'min_len', 'precision', 'recall',
+                'fp_laugh', 'tot_pred_time', 'tot_transc_notLaugh_time', 'num_of_pred_notLaughs', 'valid_pred_notLaughs', 'num_of_transc_notLaughs',
+                'tot_tp_speech_time', 'tot_tp_noise_time', 'tot_tp_silence_time']
         #cols = ['meeting', 'threshold', 'min_len', 'precision', 'recall',
          #       'corr_pred_time', 'tot_pred_time', 'tot_transc_laugh_time', 'num_of_pred_laughs', 'valid_pred_laughs', 'num_of_transc_laughs',
           #      'tot_fp_speech_time', 'tot_fp_noise_time', 'tot_fp_silence_time','tot_fp_false_silence_time']
-        if len(cols) != len(all_evals[0]):
+        if (len(cols_laugh) != len(all_evals_laugh[0])) or (len(cols_notLaugh) != len(all_evals_notLaugh[0])):
             raise Exception(
-                f'List returned by eval_preds() has wrong length. Expected length: {len(cols)}. Found: {len(all_evals[0])}.')
-        eval_df = pd.DataFrame(all_evals, columns=cols)
+                f'List returned by eval_preds() has wrong length. Expected length for laugh: {len(cols_laugh)}. Found: {len(all_evals_laugh[0])}, Expected length for laugh: {len(cols_notLaugh)}. Found: {len(all_evals_notLaugh[0])}.')
+        eval_laugh_df = pd.DataFrame(all_evals_laugh, columns=cols_laugh)
+        eval_notLaugh_df = pd.DataFrame(all_evals_notLaugh, columns=cols_notLaugh)
         if not os.path.isdir(f'{os.path.dirname(__file__)}/.cache'):
             subprocess.run(['mkdir', '.cache'])
-        eval_df.to_csv(out_path, index=False)
+        eval_laugh_df.to_csv(out_laugh_path, index=False)
+        eval_notLaugh_df.to_csv(out_notLaugh_path, index=False)
 
-    return eval_df
+    return eval_laugh_df, eval_notLaugh_df
 
 
 def calc_sum_stats(eval_df):
@@ -311,6 +355,8 @@ def calc_sum_stats(eval_df):
     # Filter thresholds
     #sum_stats = sum_stats[sum_stats['threshold'].isin([0.2,0.4,0.6,0.8])]
     return sum_stats
+
+
 
 ##################################################
 # PLOTS
@@ -464,7 +510,7 @@ def stats_for_different_min_length(preds_path):
         # create_laugh_index(parse.laugh_only_df)
 
         # Then create or load eval_df -> stats for each meeting
-        eval_df = create_evaluation_df(preds_path)
+        eval_df, eval_notLaugh_df = create_evaluation_df(preds_path)
 
         # Now calculate summary stats with new eval_df
         min_length_df = calc_sum_stats(eval_df)
@@ -533,17 +579,23 @@ def analyse(preds_dir):
     split = preds_path.name
     sum_stats_out_path = (preds_path.parent / f"{split}_{cfg['sum_stats_cache_file']}")
     eval_df_out_path = (preds_path.parent / f"{split}_{cfg['eval_df_cache_file']}")
+    #TODO:change not laugh path
+    eval_df_notlaugh_out_path = (preds_path.parent / f"{split}_{cfg['eval_notLaugh_df_cache_file']}")
     if not force_analysis and os.path.isfile(sum_stats_out_path):
         print('========================\nLOADING STATS FROM DISK\n')
         sum_stats = pd.read_csv(sum_stats_out_path)
     else:
         # Then create or load eval_df -> stats for each meeting
-        eval_df = create_evaluation_df(preds_dir, eval_df_out_path, use_cache=True)
+        eval_df, eval_notLaugh_df = create_evaluation_df(preds_dir, eval_df_out_path, eval_df_notlaugh_out_path, use_cache=True)
         # stats_for_different_min_length(preds_path)
+        
+        #TODO:sum stats for not laugh
         sum_stats = calc_sum_stats(eval_df)
+        
         print('\nWeighted summary stats across all meetings:')
         print(sum_stats)
         sum_stats.to_csv(sum_stats_out_path, index=False)
+        
         print(f'\nWritten evaluation outputs to: {sum_stats_out_path}')
 
 

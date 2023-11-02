@@ -22,7 +22,7 @@ plt.plot(x1,y1,'ro-',x2,y2,'g+-')
 plt.title('CPU rtf vs F1')
 plt.xlabel('CPU rtf')
 plt.ylabel('F1')
-#plt.legend()
+plt.legend()
 
 plt.tight_layout()
 plot_file = os.path.join('./plots', 'rtfF1.png' )
