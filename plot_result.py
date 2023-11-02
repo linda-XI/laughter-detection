@@ -1,6 +1,6 @@
 from visualise import plot_conf_matrix
 from visualise import plot_conf_matrix2
-input_dirs = ['eval/320/resnet18_small_dw', 'eval/320/baseline', 'eval/320/resnet18_dw', 'eval/320/mobilenet', 'eval/320/resnet10', 'eval/320/resnet18_big']
+input_dirs = ['eval/320/resnet50', 'eval/320/resnet32', 'eval/320/resnet18_small',  'eval/320/resnet8', 'eval/early7/resnet18', 'eval/320/efficientnet_b0']
 
 for i in input_dirs:
     name = i.split('/')[-1]
