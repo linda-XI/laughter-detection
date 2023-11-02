@@ -580,7 +580,7 @@ def analyse(preds_dir):
     sum_stats_out_path = (preds_path.parent / f"{split}_{cfg['sum_stats_cache_file']}")
     eval_df_out_path = (preds_path.parent / f"{split}_{cfg['eval_df_cache_file']}")
     #TODO:change not laugh path
-    eval_df_notlaugh_out_path = (preds_path.parent / f"{split}_{cfg['eval_df_cache_file']}")
+    eval_df_notlaugh_out_path = (preds_path.parent / f"{split}_{cfg['eval_notLaugh_df_cache_file']}")
     if not force_analysis and os.path.isfile(sum_stats_out_path):
         print('========================\nLOADING STATS FROM DISK\n')
         sum_stats = pd.read_csv(sum_stats_out_path)
