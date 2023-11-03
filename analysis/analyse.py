@@ -267,7 +267,7 @@ def eval_preds(pred_per_meeting_df, meeting_id, threshold, min_len, print_stats=
            tot_transc_laugh_time, num_of_pred_laughs, num_of_VALID_pred_laughs, num_of_tranc_laughs,
            tot_fp_speech_time, tot_fp_noise_time, tot_fp_silence_time]
 
-def create_evaluation_df(path, out_laugh_path, out_notLaugh_path use_cache=False):
+def create_evaluation_df(path, out_laugh_path, out_notLaugh_path, use_cache=False):
     """
     Creates a dataframe summarising evaluation metrics per meeting for each parameter-set
     """
@@ -321,6 +321,7 @@ def create_evaluation_df(path, out_laugh_path, out_notLaugh_path use_cache=False
             subprocess.run(['mkdir', '.cache'])
         eval_laugh_df.to_csv(out_laugh_path, index=False)
         eval_notLaugh_df.to_csv(out_notLaugh_path, index=False)
+        print(out_notLaugh_path)
 
     return eval_laugh_df, eval_notLaugh_df
 
@@ -573,7 +574,7 @@ def analyse(preds_dir):
     preds_dir: Path that contains all predicted laughs in separate dirs for each parameter
     '''
     print(f'Analysing {preds_dir}')
-    force_analysis = False 
+    force_analysis = True 
 
     preds_path = Path(preds_dir)
     split = preds_path.name
