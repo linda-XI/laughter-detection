@@ -215,7 +215,7 @@ def plot_conf_matrix2(eval_df_path, split, name='conf_matrix', thresholds=[], mi
     if show:
         plt.show()
 
-def plot_conf_matrix_laughVSnotlaugh(laugh_df_path, notlaugh_df_path, split, name='conf_matrix', thresholds=0.8, min_len=0.2, sub_dir="", show_annotations=True, show=False):
+def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresholds=0.8, min_len=0.2, sub_dir="", show_annotations=True, show=False):
     '''
     Calculate and plot confusion matrix across all meetings per parameter set
     You can specify thresholds(several) and min_len(one) which you want to include
@@ -224,8 +224,8 @@ def plot_conf_matrix_laughVSnotlaugh(laugh_df_path, notlaugh_df_path, split, nam
     if not show:
         plt.clf() # clear existing plots
 
-    laugh_path = Path(laugh_df_path)
-    not_laugh_path = Path(notlaugh_df_path)
+    laugh_path = Path(df_path)
+    #not_laugh_path = Path(notlaugh_df_path)
     laugh_df = pd.read_csv(laugh_path / f"{split}_{cfg.ANALYSIS['eval_df_cache_file']}")
     not_laugh_df = pd.read_csv(laugh_path / f"{split}_{cfg.ANALYSIS['eval_notLaugh_df_cache_file']}")
 
