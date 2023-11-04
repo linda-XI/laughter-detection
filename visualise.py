@@ -262,10 +262,10 @@ def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresho
 
     labels = ['laugh', 'speech', 'silence', 'noise']
 
-    hm = sns.heatmap(conf_ratio, yticklabels=['not laugh', 'laugh'], annot=show_annotations, cmap="YlGnBu")
-    hm.set_yticklabels(['not laugh', 'laugh'], size = 11)
+    hm = sns.heatmap(conf_ratio, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
+    hm.set_yticklabels(['laugh', 'not laugh'], size = 11)
     hm.set_xticklabels(labels, size = 12)
-    plt.ylabel('class', size=12)
+    plt.ylabel('predicted class', size=12)
     plt.xticks(rotation=0)
     plt.yticks(rotation=0)
     plt.tight_layout()
