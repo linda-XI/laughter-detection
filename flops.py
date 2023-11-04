@@ -57,6 +57,6 @@ print('la')
 flops,total_params = profile(model, inputs = (imputa,))
 macs, params = clever_format([flops,total_params]) 
 #print('FLOPs =' +str(flops/1000**3)+'G')
-print(stat(model,(1,100,44)))
+#print(stat(model,(1,100,44)))
 print(macs,params)
 
