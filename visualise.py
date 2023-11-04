@@ -215,6 +215,69 @@ def plot_conf_matrix2(eval_df_path, split, name='conf_matrix', thresholds=[], mi
     if show:
         plt.show()
 
+def plot_conf_matrix_laughVSnotlaugh(laugh_df_path, notlaugh_df_path, split, name='conf_matrix', thresholds=0.8, min_len=0.2, sub_dir="", show_annotations=True, show=False):
+    '''
+    Calculate and plot confusion matrix across all meetings per parameter set
+    You can specify thresholds(several) and min_len(one) which you want to include
+    If nothing passed, all thresholds and min_lens will be plotted
+    '''
+    if not show:
+        plt.clf() # clear existing plots
+
+    laugh_path = Path(laugh_df_path)
+    not_laugh_path = Path(notlaugh_df_path)
+    laugh_df = pd.read_csv(laugh_path / f"{split}_{cfg.ANALYSIS['eval_df_cache_file']}")
+    not_laugh_df = pd.read_csv(laugh_path / f"{split}_{cfg.ANALYSIS['eval_notLaugh_df_cache_file']}")
+
+    sum_vals_laugh = laugh_df.groupby(['threshold', 'min_len'])[['corr_pred_time', 'tot_pred_time', 'tot_transc_laugh_time', 'tot_fp_speech_time', 'tot_fp_noise_time', 'tot_fp_silence_time']].agg(['sum']).reset_index()
+    sum_vals_notlaugh =  not_laugh_df.groupby(['threshold', 'min_len'])[['fp_laugh', 'tot_pred_time', 'tot_transc_notLaugh_time', 'tot_tp_speech_time', 'tot_tp_noise_time', 'tot_tp_silence_time']].agg(['sum']).reset_index()
+
+    # Flatten Multi-index to Single-index
+    sum_vals_laugh.columns = sum_vals_laugh.columns.map('{0[0]}'.format) 
+    sum_vals_notlaugh.columns = sum_vals_notlaugh.columns.map('{0[0]}'.format) 
+    # make column name to be the same, to concat laugh df and not laugh df
+    sum_vals_notlaugh = sum_vals_notlaugh.set_axis(['threshold', 'min_len','corr_pred_time', 'tot_pred_time', 'tot_transc_laugh_time', 'tot_fp_speech_time', 'tot_fp_noise_time', 'tot_fp_silence_time'], axis=1)
+
+    sum_vals_laugh = sum_vals_laugh[sum_vals_laugh.threshold == thresholds]
+    sum_vals_laugh = sum_vals_laugh[sum_vals_laugh.min_len == min_len]
+
+    sum_vals_notlaugh = sum_vals_notlaugh[sum_vals_notlaugh.threshold == thresholds]
+    sum_vals_notlaugh = sum_vals_notlaugh[sum_vals_notlaugh.min_len == min_len]
+
+
+    print(sum_vals_laugh)
+    print("#####################")
+    print(sum_vals_notlaugh)
+    
+    #concat laugh and not laugh df
+    conf_ratio_laugh = sum_vals_laugh[['corr_pred_time', 'tot_fp_speech_time', 'tot_fp_silence_time', 'tot_fp_noise_time']].copy()
+    conf_ratio_notlaugh = sum_vals_notlaugh[['corr_pred_time', 'tot_fp_speech_time', 'tot_fp_silence_time', 'tot_fp_noise_time']].copy()
+    conf_ratio = conf_ratio_laugh.append(conf_ratio_notlaugh)
+
+    #dived by total time 
+    conf_ratio = conf_ratio.div(conf_ratio.to_numpy().sum(), axis=0)
+    # Set all ratio-vals to 0 if there is no prediction time at all
+    conf_ratio.loc[sum_vals_laugh.tot_pred_time == 0.0, ['corr_pred_time', 'tot_fp_speech_time','tot_fp_silence_time', 'tot_fp_noise_time']] = 0 
+
+
+    labels = ['laugh', 'speech', 'silence', 'noise']
+
+    hm = sns.heatmap(conf_ratio, yticklabels=['not laugh', 'laugh'], annot=show_annotations, cmap="YlGnBu")
+    hm.set_yticklabels(['not laugh', 'laugh'], size = 11)
+    hm.set_xticklabels(labels, size = 12)
+    plt.ylabel('class', size=12)
+    plt.xticks(rotation=0)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name}.png')
+    Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
+    plt.savefig(plot_file)
+    
+    print('\n=======Confusion Matrix========')
+    print(conf_ratio)
+    if show:
+        plt.show()
+
 # ============================================
 # EXPERIMENTS 
 # ============================================
