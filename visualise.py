@@ -278,6 +278,8 @@ def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresho
     Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
     plt.savefig(plot_file)
 
+    plt.clf() # clear existing plots
+
     hm = sns.heatmap(conf_ratio_by_cols, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
     hm.set_yticklabels(['laugh', 'not laugh'], size = 11)
     hm.set_xticklabels(labels, size = 12)
