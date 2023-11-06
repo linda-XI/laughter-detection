@@ -255,26 +255,44 @@ def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresho
     conf_ratio = conf_ratio_laugh.append(conf_ratio_notlaugh)
 
     #dived by total time 
-    conf_ratio = conf_ratio.div(conf_ratio.to_numpy().sum(), axis=0)
+    #conf_ratio = conf_ratio.div(conf_ratio.to_numpy().sum(), axis=0)
+
+    conf_ratio_by_rows = conf_ratio.div(conf_ratio.sum(axis='columns'), axis=0)
+    conf_ratio_by_cols = conf_ratio.div(conf_ratio.sum(), axis=1)
+
     # Set all ratio-vals to 0 if there is no prediction time at all
-    conf_ratio.loc[sum_vals_laugh.tot_pred_time == 0.0, ['corr_pred_time', 'tot_fp_speech_time','tot_fp_silence_time', 'tot_fp_noise_time']] = 0 
+    conf_ratio_by_rows.loc[sum_vals_laugh.tot_pred_time == 0.0, ['corr_pred_time', 'tot_fp_speech_time','tot_fp_silence_time', 'tot_fp_noise_time']] = 0 
+    conf_ratio_by_cols.loc[sum_vals_laugh.tot_pred_time == 0.0, ['corr_pred_time', 'tot_fp_speech_time','tot_fp_silence_time', 'tot_fp_noise_time']] = 0 
 
 
     labels = ['laugh', 'speech', 'silence', 'noise']
 
-    hm = sns.heatmap(conf_ratio, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
+    hm = sns.heatmap(conf_ratio_by_rows, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
     hm.set_yticklabels(['laugh', 'not laugh'], size = 11)
     hm.set_xticklabels(labels, size = 12)
     plt.ylabel('predicted class', size=12)
     plt.xticks(rotation=0)
     plt.yticks(rotation=0)
     plt.tight_layout()
-    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name}.png')
+    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+"_row"}.png')
+    Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
+    plt.savefig(plot_file)
+
+    hm = sns.heatmap(conf_ratio_by_cols, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
+    hm.set_yticklabels(['laugh', 'not laugh'], size = 11)
+    hm.set_xticklabels(labels, size = 12)
+    plt.ylabel('predicted class', size=12)
+    plt.xticks(rotation=0)
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+"_cols"}.png')
     Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
     plt.savefig(plot_file)
     
-    print('\n=======Confusion Matrix========')
-    print(conf_ratio)
+    print('\n=======Confusion Matrix rows sum to one ========')
+    print(conf_ratio_by_rows)
+    print('\n=======Confusion Matrix clos sum to one ========')
+    print(conf_ratio_by_cols)
     if show:
         plt.show()
 
