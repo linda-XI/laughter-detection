@@ -267,6 +267,8 @@ def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresho
 
     labels = ['laugh', 'speech', 'silence', 'noise']
 
+    plt.figure(1)
+    plt.subplot(211)
     hm = sns.heatmap(conf_ratio_by_rows, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
     hm.set_yticklabels(['laugh', 'not laugh'], size = 11)
     hm.set_xticklabels(labels, size = 12)
@@ -274,20 +276,23 @@ def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresho
     plt.xticks(rotation=0)
     plt.yticks(rotation=0)
     plt.tight_layout()
-    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+"_row"}.png')
-    Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
-    plt.savefig(plot_file)
+    plt.gca().set_title('normalize by rows')
+    # plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+"_row"}.png')
+    # Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
+    # plt.savefig(plot_file)
 
-    plt.clf() # clear existing plots
-
+    
+    plt.subplot(212)
     hm = sns.heatmap(conf_ratio_by_cols, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
     hm.set_yticklabels(['laugh', 'not laugh'], size = 11)
     hm.set_xticklabels(labels, size = 12)
     plt.ylabel('predicted class', size=12)
     plt.xticks(rotation=0)
     plt.yticks(rotation=0)
-    plt.tight_layout()
-    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+"_cols"}.png')
+    plt.tight_layout(pad=3.0)
+    plt.gca().set_title('normalize by columns')
+
+    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+}.png')
     Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
     plt.savefig(plot_file)
     
