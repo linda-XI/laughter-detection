@@ -292,7 +292,7 @@ def plot_conf_matrix_laughVSnotlaugh(df_path, split, name='conf_matrix', thresho
     plt.tight_layout(pad=3.0)
     plt.gca().set_title('normalize by columns')
 
-    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name+}.png')
+    plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name}.png')
     Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
     plt.savefig(plot_file)
     
