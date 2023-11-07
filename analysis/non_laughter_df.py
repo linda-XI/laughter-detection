@@ -277,7 +277,7 @@ def create_evaluation_df(path, out_notLaugh_path, use_cache=False):
                 'fp_laugh', 'tot_pred_time', 'tot_transc_notLaugh_time', 'num_of_pred_notLaughs', 'valid_pred_notLaughs', 'num_of_transc_notLaughs',
                 'tot_tp_speech_time', 'tot_tp_noise_time', 'tot_tp_silence_time']
 
-        if (len(cols_notLaugh) != len(cols_notLaugh[0])) :
+        if (len(cols_notLaugh) != len(all_evals_notLaugh[0])) :
             raise Exception(
                 f'List returned by eval_preds() has wrong length.  Expected length for laugh: {len(cols_notLaugh)}. Found: {len(all_evals_notLaugh[0])}.')
         
