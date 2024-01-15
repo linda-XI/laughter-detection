@@ -1,13 +1,13 @@
 import os
 import pandas as pd
 from typing import List, Optional, Tuple
-from pydantic import BaseModel
-from strenum import StrEnum
-from lxml import etree
 from pathlib import Path
 import sys
+import textgrids
+from analysis.transcript_parsing import parse
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from config import ANALYSIS as cfg
+
 
 # laugh_only_df = pd.DataFrame(tot_laugh_only_segs)
 # invalid_df = pd.DataFrame(tot_invalid_segs )
