@@ -127,15 +127,15 @@ def update_laugh_only_df(path, out_path, use_cache=False):
                     # 计算 'start' 之差
                     diff = abs(start_new - start_total)
 
-                    # 如果 'start_new' 与 'start_total' 之差小于 0.2，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
+                    # 如果 'start_new' 与 'start_total' 之差小于 0.2，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
                     if ((diff < 0.2) 
-                        and ((textgrid_df.iloc[j]['meeting_id'] != laugh_only_df.iloc[j]['meeting_id']) 
-                        or (textgrid_df.iloc[j]['chan'] != laugh_only_df.iloc[j]['chan']))):
+                        and (textgrid_df.iloc[j]['meeting_id'] == laugh_only_df.iloc[j]['meeting_id']) 
+                        and (textgrid_df.iloc[j]['chan'] != laugh_only_df.iloc[j]['chan'])):
                             
                         new_row = pd.DataFrame({
                             'meeting_id': textgrid_df.iloc[j]['meeting_id'],
                             'part_id': textgrid_df.iloc[j]['part_id'],
-                            'chan': textgrid_df.iloc[j]['chan'],
+                            'chan_id': textgrid_df.iloc[j]['chan'],
                             'start': laugh_only_df.iloc[i]['start'],
                             'end': laugh_only_df.iloc[j]['end'],
                             'length': laugh_only_df.iloc[j]['length'],
