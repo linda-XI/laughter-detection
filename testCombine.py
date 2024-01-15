@@ -120,35 +120,36 @@ def update_laugh_only_df(path, out_path, use_cache=False):
 
                 i, j = 0, 0  
                 while i < len(laugh_only_df) and j < len(textgrid_df):
-                    # 获取当前行的 'start' 值
-                    start_total = laugh_only_df.iloc[i]['start']
-                    start_new = textgrid_df.iloc[j]['start']
+                    if(textgrid_df.iloc[j]['meeting_id'] == laugh_only_df.iloc[i]['meeting_id']):
+                        # 获取当前行的 'start' 值
+                        start_total = laugh_only_df.iloc[i]['start']
+                        start_new = textgrid_df.iloc[j]['start']
 
-                    # 计算 'start' 之差
-                    diff = abs(start_new - start_total)
+                        # 计算 'start' 之差
+                        diff = abs(start_new - start_total)
+                        print(diff)
 
-                    # 如果 'start_new' 与 'start_total' 之差小于 0.2，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
-                    if ((diff < 1) 
-                        and (textgrid_df.iloc[j]['meeting_id'] == laugh_only_df.iloc[i]['meeting_id']) 
-                        and (textgrid_df.iloc[j]['chan_id'] != laugh_only_df.iloc[i]['chan_id'])):
-                        
-                        new_row = pd.DataFrame({
-                            'meeting_id': textgrid_df.iloc[j]['meeting_id'],
-                            'part_id': textgrid_df.iloc[j]['part_id'],
-                            'chan_id': textgrid_df.iloc[j]['chan_id'],
-                            'start': laugh_only_df.iloc[i]['start'],
-                            'end': laugh_only_df.iloc[i]['end'],
-                            'length': laugh_only_df.iloc[i]['length'],
-                            'type': laugh_only_df.iloc[i]['type'],
-                            'laugh_type': laugh_only_df.iloc[i]['laugh_type']
-                        }, index=[0])
-
-                        print(new_row)
-
-                        laugh_only_df = pd.concat([laugh_only_df, new_row], ignore_index=True)
-                        j += 1
-                    elif start_new < start_total:
-                        j += 1
+                        # 如果 'start_new' 与 'start_total' 之差小于 0.2，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
+                        if ((diff < 1)  
+                            and (textgrid_df.iloc[j]['chan_id'] != laugh_only_df.iloc[i]['chan_id'])):
+                            
+                            new_row = pd.DataFrame({
+                                'meeting_id': textgrid_df.iloc[j]['meeting_id'],
+                                'part_id': textgrid_df.iloc[j]['part_id'],
+                                'chan_id': textgrid_df.iloc[j]['chan_id'],
+                                'start': laugh_only_df.iloc[i]['start'],
+                                'end': laugh_only_df.iloc[i]['end'],
+                                'length': laugh_only_df.iloc[i]['length'],
+                                'type': laugh_only_df.iloc[i]['type'],
+                                'laugh_type': laugh_only_df.iloc[i]['laugh_type']
+                            }, index=[0])
+                            print(new_row)
+                            laugh_only_df = pd.concat([laugh_only_df, new_row], ignore_index=True)
+                            j += 1
+                        elif start_new < start_total:
+                            j += 1
+                        else:
+                            i += 1
                     else:
                         i += 1
             
