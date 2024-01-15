@@ -79,18 +79,13 @@ def get_params_from_path(path):
     return params
 
 
-def textgrid_to_df(file_path):
+def textgrid_to_df(full_path):
     '''
     convert textgrid of a meeting into dataframe
-    '''
-    tot_list = []
-    for filename in os.listdir(file_path):
-        if filename.endswith('.TextGrid'):
-            full_path = os.path.join(file_path, filename)
-            
-            params = get_params_from_path(full_path)
-            tot_list += textgrid_to_list(full_path,
-                                         params)
+    '''           
+    params = get_params_from_path(full_path)
+    tot_list = textgrid_to_list(full_path,
+                                    params)
 
     cols = ['meeting_id', 'part_id', 'chan', 'start',
             'end', 'length', 'type', 'laugh_type']
