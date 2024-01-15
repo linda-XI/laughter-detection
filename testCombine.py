@@ -93,6 +93,7 @@ def textgrid_to_df(full_path):
     return df
 
 def update_laugh_only_df(path, out_path, use_cache=False):
+    global laugh_only_df
     """
     Creates a dataframe summarising evaluation metrics per meeting for each parameter-set
     """
