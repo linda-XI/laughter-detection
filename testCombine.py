@@ -142,7 +142,7 @@ def update_laugh_only_df(path, out_path, use_cache=False):
                                 'end': laugh_only_df.iloc[i]['end'],
                                 'length': laugh_only_df.iloc[i]['length'],
                                 'type': laugh_only_df.iloc[i]['type'],
-                                'laugh_type': laugh_only_df.iloc[i]['laugh_type']
+                                'laugh_type': textgrid_df.iloc[j]['laugh_type']
                             }, index=[0])
                             print(new_row)
                             temp_laugh_df = pd.concat([temp_laugh_df, new_row], ignore_index=True)
@@ -174,6 +174,7 @@ def update_laugh_only_df(path, out_path, use_cache=False):
         # if not os.path.isdir(f'{os.path.dirname(__file__)}/.cache'):
             # subprocess.run(['mkdir', '.cache'])
     laugh_only_df = pd.concat([laugh_only_df, temp_laugh_df], ignore_index=True)
+    laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     laugh_only_df.to_csv(out_path, index=False)
 
     return laugh_only_df
