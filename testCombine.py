@@ -94,6 +94,7 @@ def textgrid_to_df(full_path):
 
 def update_laugh_only_df(path, out_path, use_cache=False):
     global laugh_only_df
+    temp_laugh_df = pd.DataFrame() 
     """
     Creates a dataframe summarising evaluation metrics per meeting for each parameter-set
     """
@@ -144,7 +145,7 @@ def update_laugh_only_df(path, out_path, use_cache=False):
                                 'laugh_type': laugh_only_df.iloc[i]['laugh_type']
                             }, index=[0])
                             print(new_row)
-                            laugh_only_df = pd.concat([laugh_only_df, new_row], ignore_index=True)
+                            temp_laugh_df = pd.concat([temp_laugh_df, new_row], ignore_index=True)
                             j += 1
                         elif start_new < start_total:
                             j += 1
@@ -152,6 +153,7 @@ def update_laugh_only_df(path, out_path, use_cache=False):
                             i += 1
                     else:
                         i += 1
+                
             
                     # thr_val = threshold.replace('t_', '')
                     # min_len_val = min_length.replace('l_', '')
@@ -171,6 +173,7 @@ def update_laugh_only_df(path, out_path, use_cache=False):
         # eval_df = pd.DataFrame(all_evals, columns=cols)
         # if not os.path.isdir(f'{os.path.dirname(__file__)}/.cache'):
             # subprocess.run(['mkdir', '.cache'])
+    laugh_only_df = pd.concat([laugh_only_df, temp_laugh_df], ignore_index=True)
     laugh_only_df.to_csv(out_path, index=False)
 
     return laugh_only_df
