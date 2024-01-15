@@ -115,7 +115,7 @@ def update_laugh_only_df(path, out_path, use_cache=False):
         # meeting_id = meeting_path.split("/")[-1]
         threshold_dir = os.path.join(meeting_path, 't_0.8')
         #textgrid_dir: dir that contains all channel textgrid of a meeting
-        textgrid_dir = os.path.join(threshold_dir, 't_0.2')
+        textgrid_dir = os.path.join(threshold_dir, 'l_0.2')
         for filename in os.listdir(textgrid_dir):
             if filename.endswith('.TextGrid'):
                 full_path = os.path.join(textgrid_dir, filename)
