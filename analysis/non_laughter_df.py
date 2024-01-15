@@ -47,9 +47,6 @@ def textgrid_to_list_notLaugh(full_path, params):
             seg_length = interval.xmax - interval.xmin
             interval_list.append([params['meeting_id'], part_id, params['chan_id'], interval.xmin,
                                   interval.xmax, seg_length, params['threshold'], params['min_len'], str(interval.text)])
-        print(params['meeting_id'])
-        print(params['chan_id'])
-        print(interval_list)
 
     return interval_list
 ##############################################################################################################
