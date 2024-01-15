@@ -137,8 +137,8 @@ def update_laugh_only_df(path, out_path, use_cache=False):
                             'part_id': textgrid_df.iloc[j]['part_id'],
                             'chan_id': textgrid_df.iloc[j]['chan_id'],
                             'start': laugh_only_df.iloc[i]['start'],
-                            'end': laugh_only_df.iloc[j]['end'],
-                            'length': laugh_only_df.iloc[j]['length'],
+                            'end': laugh_only_df.iloc[i]['end'],
+                            'length': laugh_only_df.iloc[i]['length'],
                             'type': laugh_only_df.iloc[i]['type'],
                             'laugh_type': laugh_only_df.iloc[i]['laugh_type']
                         }, index=[0])
