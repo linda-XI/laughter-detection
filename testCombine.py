@@ -7,7 +7,8 @@ import textgrids
 from analysis.transcript_parsing import parse
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from config import ANALYSIS as cfg
-
+import portion as P
+import analysis.utils as utils
 
 # laugh_only_df = pd.DataFrame(tot_laugh_only_segs)
 # invalid_df = pd.DataFrame(tot_invalid_segs )
@@ -15,6 +16,17 @@ from config import ANALYSIS as cfg
 # noise_df = pd.DataFrame(tot_noise_segs)
 laugh_only_df = pd.read_csv('./sample/laugh_only_df.csv')
 
+class Segment(BaseModel):
+    """Represent a Transcription segment from ICSI transcripts"""
+
+    meeting_id: str
+    part_id: str
+    chan_id: str
+    start: float
+    end: float
+    length: float
+    type: SegmentType
+    laugh_type: Optional[str]
 
 def textgrid_to_list(full_path, params):
     # There are more recorded channels than participants
@@ -92,7 +104,13 @@ def textgrid_to_df(full_path):
     df = pd.DataFrame(tot_list, columns=cols)
     return df
 
-def update_laugh_only_df(path, out_path, use_cache=False):
+def update_laugh_only_df(path, use_cache=False):
+    '''
+        a channel can heard oter channels'laugh. 
+        use update_laugh_only_df to update the laugh_only_df to add these extra laugh for each channel
+        Note that this will cause overlaps of laughter for each channel.
+    '''
+
     global laugh_only_df
     temp_laugh_df = pd.DataFrame() 
     """
@@ -175,9 +193,82 @@ def update_laugh_only_df(path, out_path, use_cache=False):
             # subprocess.run(['mkdir', '.cache'])
     laugh_only_df = pd.concat([laugh_only_df, temp_laugh_df], ignore_index=True)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
-    laugh_only_df.to_csv(out_path, index=False)
+    
 
     return laugh_only_df
+
+
+def interval_to_seg(meeting_id, part_id, chan_id, interval) -> Optional[Segment]:
+    """
+    Input: xml laughter segment as etree Element, meeting id
+    Output: list of features representing this laughter segment:
+        - Format: [meeting_id, part_id, chan_id, start, end, length, l_type]
+        - returns [] if no valid part_id was found
+    """
+    
+    new_seg = Segment(
+        meeting_id=meeting_id,
+        part_id=part_id,
+        chan_id=chan_id,
+        start=interval[0],
+        end=interval[1],
+        length=interval[1] - interval[0],
+        type='laugh',
+        laugh_type='laugh',
+    )
+        
+    return new_seg
+
+def delete_from_df(non_laugh_df, laugh_portion):
+    for _, row in non_laugh_df.iterrows():
+        # Create interval representing the predicted laughter defined by this row
+        start = row['start']
+        end = row['end']
+        duration = P.openclosed(start, end)
+        portion = portion | duration
+    portion = portion - laugh_portion
+    return portion
+
+def refine_laugh_df(out_path):
+    '''refine each channel's df to delete the overlap between rows
+       input: laugh_only_df
+    '''
+    global laugh_only_df
+    laugh_only_list: List[Segment] = []
+    speech_only_list: List[Segment] = []
+    laugh_group_by = laugh_only_df.groupby(['meeting_id','part_id', 'chan_id'])
+    # speech_group_by = speech_only_df.groupby(['meeting_id','part_id', 'chan_id'])
+
+    for id, part_df in laugh_group_by:
+        meeting_id = id[0]
+        part_id = id[1]
+        chan_id = id[2]
+        laugh_portion = P.empty()
+        for _, row in part_df.iterrows():
+            # Create interval representing the predicted laughter defined by this row
+            start = row['start']
+            end = row['end']
+            laugh_duration = P.openclosed(start, end)
+            laugh_portion = laugh_portion | laugh_duration
+        #get speech df of a channel, convert it into portion, then remove the laugh portion from the speech protion
+        # part_speech_df = speech_group_by.get_group(id)
+        # speech_portion = delete_from_df(part_speech_df, laugh_portion)
+
+        #>>> list(P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))
+        #[[0,1], (10,11), [20,21]]
+        #add one channel's laugh into df
+        for interval in list(laugh_portion):
+            seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
+            laugh_only_list.append(seg.dict())
+
+        # for interval in list(speech_portion):
+            # seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
+            # speech_only_list.append(seg.dict())
+
+    laugh_only_df = pd.DataFrame(laugh_only_list)
+    laugh_only_df.to_csv(out_path, index=False)
+    return laugh_only_df
+        
 
 
 
@@ -190,4 +281,5 @@ if __name__ == "__main__":
     #outpath is ./sample/testOutput/new_laugh_only.csv
     path = sys.argv[1]
     out_path = sys.argv[2]
-    update_laugh_only_df(path, out_path)
+    update_laugh_only_df(path)
+    refine_laugh_df(out_path)
