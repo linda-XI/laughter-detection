@@ -118,7 +118,7 @@ def textgrid_to_df(full_path):
     df = pd.DataFrame(tot_list, columns=cols)
     return df
 
-def update_laugh_only_df(path, use_cache=False):
+def update_laugh_only_df(path, out_path):
     '''
         a channel can heard oter channels'laugh. 
         use update_laugh_only_df to update the laugh_only_df to add these extra laugh for each channel
@@ -138,7 +138,7 @@ def update_laugh_only_df(path, use_cache=False):
     # else:
     # all_evals = []
     print('Calculating metrics for every meeting for every parameter-set:')
-    for meeting in os.listdir(path, out_path):
+    for meeting in os.listdir(path):
         #print(f'Evaluating meeting {meeting}...')
         meeting_path = os.path.join(path, meeting)
         # meeting_id = meeting_path.split("/")[-1]
