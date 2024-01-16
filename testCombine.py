@@ -224,9 +224,9 @@ def interval_to_seg(meeting_id, part_id, chan_id, interval) -> Optional[Segment]
         meeting_id=meeting_id,
         part_id=part_id,
         chan_id=chan_id,
-        start=interval[0],
-        end=interval[1],
-        length=interval[1] - interval[0],
+        start=interval.lower,
+        end=interval.upper,
+        length=interval.upper - interval.lower,
         type='laugh',
         laugh_type='laugh',
     )
