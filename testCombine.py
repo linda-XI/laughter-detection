@@ -9,6 +9,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 from config import ANALYSIS as cfg
 import portion as P
 import analysis.utils as utils
+from pydantic import BaseModel
 
 # laugh_only_df = pd.DataFrame(tot_laugh_only_segs)
 # invalid_df = pd.DataFrame(tot_invalid_segs )
@@ -16,6 +17,18 @@ import analysis.utils as utils
 # noise_df = pd.DataFrame(tot_noise_segs)
 laugh_only_df = pd.read_csv('./sample/laugh_only_df.csv')
 
+class SegmentType(StrEnum):
+    '''
+    Describes the type of data that was transcribed in this segment. 
+    For detailed information: https://www1.icsi.berkeley.edu/Speech/mr/icsimc_doc/trans_guide.txt
+    '''
+    INVALID = 'invalid'  # e.g. laughter segments occurring next to speech or other noise
+    SPEECH = 'speech' 
+    LAUGH = 'laugh' 
+    OTHER_VOCAL = 'other_vocal'  # segments containing a single VocalSound that's not laughter
+    NON_VOCAL = 'non_vocal' # segments containing a single NonVocalSound (e.g. 'mic noise')
+    MIXED = 'mixed'  # contains some mixture of speech / noise and silence (but no laughter)
+    
 class Segment(BaseModel):
     """Represent a Transcription segment from ICSI transcripts"""
 
