@@ -138,7 +138,7 @@ def update_laugh_only_df(path, use_cache=False):
     # else:
     # all_evals = []
     print('Calculating metrics for every meeting for every parameter-set:')
-    for meeting in os.listdir(path):
+    for meeting in os.listdir(path, out_path):
         #print(f'Evaluating meeting {meeting}...')
         meeting_path = os.path.join(path, meeting)
         # meeting_id = meeting_path.split("/")[-1]
@@ -207,6 +207,7 @@ def update_laugh_only_df(path, use_cache=False):
             # subprocess.run(['mkdir', '.cache'])
     laugh_only_df = pd.concat([laugh_only_df, temp_laugh_df], ignore_index=True)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    laugh_only_df.to_csv(out_path, index=False)
     
 
     return laugh_only_df
@@ -297,5 +298,5 @@ if __name__ == "__main__":
     #outpath is ./sample/testOutput/new_laugh_only.csv
     path = sys.argv[1]
     out_path = sys.argv[2]
-    update_laugh_only_df(path)
-    refine_laugh_df(out_path)
+    update_laugh_only_df(path, out_path)
+    # refine_laugh_df(out_path)
