@@ -10,6 +10,7 @@ from config import ANALYSIS as cfg
 import portion as P
 import analysis.utils as utils
 from pydantic import BaseModel
+from strenum import StrEnum
 
 # laugh_only_df = pd.DataFrame(tot_laugh_only_segs)
 # invalid_df = pd.DataFrame(tot_invalid_segs )
@@ -28,7 +29,7 @@ class SegmentType(StrEnum):
     OTHER_VOCAL = 'other_vocal'  # segments containing a single VocalSound that's not laughter
     NON_VOCAL = 'non_vocal' # segments containing a single NonVocalSound (e.g. 'mic noise')
     MIXED = 'mixed'  # contains some mixture of speech / noise and silence (but no laughter)
-    
+
 class Segment(BaseModel):
     """Represent a Transcription segment from ICSI transcripts"""
 
