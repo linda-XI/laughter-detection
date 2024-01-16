@@ -272,6 +272,7 @@ def refine_laugh_df(out_path):
         #[[0,1], (10,11), [20,21]]
         #add one channel's laugh into df
         for interval in list(laugh_portion):
+            print(interval)
             seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
             laugh_only_list.append(seg.dict())
 
