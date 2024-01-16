@@ -281,6 +281,7 @@ def refine_laugh_df(out_path):
             # speech_only_list.append(seg.dict())
 
     laugh_only_df = pd.DataFrame(laugh_only_list)
+    laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     laugh_only_df.to_csv(out_path, index=False)
     return laugh_only_df
         
