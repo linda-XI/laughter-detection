@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import portion as P
 import textgrids
+import subprocess
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from config import ANALYSIS as cfg
 
@@ -483,7 +484,8 @@ def refine_laugh_df(out_path):
             seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
             laugh_only_list.append(seg.dict())
 
-
+    if not os.path.isdir(out_path):
+        subprocess.run(['mkdir', out_path])
     laugh_only_df = pd.DataFrame(laugh_only_list)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv.csv', index=False)
