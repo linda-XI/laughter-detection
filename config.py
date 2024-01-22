@@ -252,7 +252,7 @@ ANALYSIS= {
     "force_index_recompute": False,
     #store all the predict laugh from seed model
     "extra_laugh_dir": str(root_path / 'seedModel/predTrain'),
-    "test_df_dir": str(root_path / 'seedModel/predTrain/testDF')
+    "test_df_dir": str(root_path / 'seedModel/testDF')
 }
 
 ANALYSIS['model'] = {
