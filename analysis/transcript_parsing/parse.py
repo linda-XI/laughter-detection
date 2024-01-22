@@ -453,13 +453,26 @@ def refine_laugh_df(out_path):
             laugh_duration = P.open(start, end)
             laugh_portion = laugh_portion | laugh_duration
         #get speech df of a channel, convert it into portion, then remove the laugh portion from the speech protion
-        part_speech_df = speech_group_by.get_group(id)
-        part_invalid_df = invalid_group_by.get_group(id)
-        part_noise_df = noise_group_by.get_group(id)
+        if id in speech_group_by.groups:
+            part_speech_df = speech_group_by.get_group(id)
+            speech_portion = delete_from_df(part_speech_df, laugh_portion)
+            for interval in list(speech_portion):
+                seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
+                speech_only_list.append(seg.dict())
 
-        speech_portion = delete_from_df(part_speech_df, laugh_portion)
-        invalid_portion = delete_from_df(part_invalid_df, laugh_portion)
-        noise_portion = delete_from_df(part_noise_df, laugh_portion)
+        if id in invalid_group_by.groups:
+            part_invalid_df = invalid_group_by.get_group(id)
+            invalid_portion = delete_from_df(part_invalid_df, laugh_portion)
+            for interval in list(invalid_portion):
+                seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
+                invalid_only_list.append(seg.dict())
+
+        if id in noise_group_by.groups:
+            part_noise_df = noise_group_by.get_group(id)
+            noise_portion = delete_from_df(part_noise_df, laugh_portion)
+            for interval in list(noise_portion):
+                seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
+                noise_only_list.append(seg.dict())
 
         #>>> list(P.open(10, 11) | P.closed(0, 1) | P.closed(20, 21))
         #[[0,1], (10,11), [20,21]]
@@ -469,17 +482,6 @@ def refine_laugh_df(out_path):
             seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
             laugh_only_list.append(seg.dict())
 
-        for interval in list(speech_portion):
-            seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
-            speech_only_list.append(seg.dict())
-
-        for interval in list(invalid_portion):
-            seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
-            invalid_only_list.append(seg.dict())
-
-        for interval in list(noise_portion):
-            seg = interval_to_seg(meeting_id, part_id, chan_id, interval)
-            noise_only_list.append(seg.dict())
 
     laugh_only_df = pd.DataFrame(laugh_only_list)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
