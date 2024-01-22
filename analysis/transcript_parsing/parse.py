@@ -341,6 +341,7 @@ def delete_from_df(non_laugh_df, laugh_portion):
     '''
     delete extra laugh from speech only df and so on
     '''
+    portion = P.empty()
     for _, row in non_laugh_df.iterrows():
         # Create interval representing the predicted laughter defined by this row
         start = row['start']
@@ -394,7 +395,7 @@ def update_laugh_only_df(path):
 
                         # 计算 'start' 之差
                         diff = abs(start_new - start_total)
-                        print(diff)
+                        # print(diff)
 
                         # 如果 'start_new' 与 'start_total' 之差小于 0.2，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
                         if ((diff < 1)  
@@ -410,7 +411,7 @@ def update_laugh_only_df(path):
                                 'type': laugh_only_df.iloc[i]['type'],
                                 'laugh_type': textgrid_df.iloc[j]['laugh_type']
                             }, index=[0])
-                            # print(new_row)
+                            print(new_row)
                             temp_laugh_df = pd.concat([temp_laugh_df, new_row], ignore_index=True)
                             j += 1
                         elif start_new < start_total:
