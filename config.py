@@ -249,7 +249,10 @@ ANALYSIS= {
 
     # Indices are loaded from disk if possible. This option forces re-computation 
     # If True analyse.py will take a lot longer
-    "force_index_recompute": False 
+    "force_index_recompute": False,
+    #store all the predict laugh from seed model
+    "extra_laugh_dir": str(root_path / 'seedModel/predTrain'),
+    "test_df_dir": str(root_path / 'seedModel/predTrain/testDF')
 }
 
 ANALYSIS['model'] = {

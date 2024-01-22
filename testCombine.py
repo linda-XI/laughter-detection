@@ -120,6 +120,7 @@ def textgrid_to_df(full_path):
 
 def update_laugh_only_df(path):
     '''
+        Add extra laugh into laugh_only_df
         a channel can heard oter channels'laugh. 
         use update_laugh_only_df to update the laugh_only_df to add these extra laugh for each channel
         Note that this will cause overlaps of laughter for each channel.
@@ -235,11 +236,14 @@ def interval_to_seg(meeting_id, part_id, chan_id, interval) -> Optional[Segment]
     return new_seg
 
 def delete_from_df(non_laugh_df, laugh_portion):
+    '''
+    delete extra laugh from speech only df and so on
+    '''
     for _, row in non_laugh_df.iterrows():
         # Create interval representing the predicted laughter defined by this row
         start = row['start']
         end = row['end']
-        duration = P.openclosed(start, end)
+        duration = P.open(start, end)
         portion = portion | duration
     portion = portion - laugh_portion
     return portion
@@ -249,6 +253,8 @@ def refine_laugh_df(out_path):
        input: laugh_only_df
     '''
     global laugh_only_df
+    # global speech_only_df
+
     laugh_only_list: List[Segment] = []
     speech_only_list: List[Segment] = []
     laugh_group_by = laugh_only_df.groupby(['meeting_id','part_id', 'chan_id'])
@@ -284,7 +290,11 @@ def refine_laugh_df(out_path):
     laugh_only_df = pd.DataFrame(laugh_only_list)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     laugh_only_df.to_csv(out_path, index=False)
-    return laugh_only_df
+
+    # speech_only_df = pd.DataFrame(laugh_only_list)
+    # speech_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    # speech_only_df.to_csv(out_path, index=False)
+    return laugh_only_df, speech_only_df
         
 
 
