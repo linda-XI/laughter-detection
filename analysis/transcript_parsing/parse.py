@@ -22,10 +22,18 @@ part_to_chan = {}  # index mapping participant to channel per meeting
 laugh_only_df = pd.DataFrame()  
 invalid_df = pd.DataFrame() 
 noise_df = pd.DataFrame()    
-speech_df = pd.DataFrame()   
+speech_df = pd.DataFrame()  
+
 
 # Dataframe containing total length and audio_path of each channel
 info_df = pd.DataFrame()
+
+# overlap_df records the overlaped participants' laughter. 
+# The laughter in the overlap_df need to be ignored for test set when evaluating the model,
+# because these participants also appear in training set. 
+overlap_df = pd.DataFrame()  
+testSet = ["Bns002", "Bns003", "Btr001", "Btr002", "Bns001"]
+overlapPart = ["me011", "fe008"]
 
 
 class SegmentType(StrEnum):
@@ -183,10 +191,13 @@ def get_segment_list(filename, meeting_id):
     laugh_only_list: List[Segment] = []  # LAUGH
     speech_list: List[Segment] = []  # SPEECH
     noise_list: List[Segment] = []  # MIXED, NON_VOCAL, OTHER_VOCAL
+    overlap_list: List[Segment] = [] # record the overlap participant's laughter in testSet. 
 
     # Get all segments that contain some kind of laughter (e.g. 'laugh', 'breath-laugh')
     # xpath_exp = "//Segment[VocalSound[contains(@Description,'laugh')]]"
     tree = etree.parse(filename)
+ 
+
     # laugh_segs = tree.xpath(xpath_exp)
     all_segs = tree.xpath("//Segment")
 
@@ -194,6 +205,8 @@ def get_segment_list(filename, meeting_id):
     # mixed laugh means that the laugh occurred next to speech or any other sound
     for xml_seg in all_segs:
         seg = xml_to_segment(xml_seg, meeting_id)
+        if meeting_id in testSet and seg.chan_id in overlapPart and seg.type == SegmentType.LAUGH:
+            overlap_list.append(seg.dict())
         if (seg==None): # Skip segment without audio chan
             continue
         if seg.type == SegmentType.LAUGH:
@@ -205,7 +218,7 @@ def get_segment_list(filename, meeting_id):
         else:
             noise_list.append(seg.dict())
 
-    return invalid_list, speech_list, laugh_only_list, noise_list
+    return invalid_list, speech_list, laugh_only_list, noise_list, overlap_list
 
 
 def general_info_to_list(filename, meeting_id):
@@ -433,7 +446,7 @@ def refine_laugh_df(out_path):
     '''refine each channel's df to delete the overlap of laughter between rows using portion library.
        remove extra laugh from speech only df and so on.
     '''
-    global laugh_only_df, invalid_df, noise_df, speech_df
+    global laugh_only_df, invalid_df, noise_df, speech_df, overlap_df
 
     laugh_only_list: List[Segment] = []
     speech_only_list: List[Segment] = []
@@ -504,6 +517,9 @@ def refine_laugh_df(out_path):
     noise_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     noise_df.to_csv(out_path + '/test_noise_df.csv', index=False)
 
+    
+    overlap_df.to_csv(out_path + '/overlap_df.csv', index=False)
+
     return laugh_only_df, speech_df, noise_df, speech_df
 
 
@@ -525,13 +541,14 @@ def create_dfs(file_dir, files):
     info_df columns: ['meeting_id', 'part_id', 'chan_id', 'length', 'path']
 
     """
-    global laugh_only_df, invalid_df, info_df, noise_df, speech_df
+    global laugh_only_df, invalid_df, info_df, noise_df, speech_df, overlap_df
 
     # Define lists holding all the rows for those dataframes
     tot_invalid_segs = []
     tot_speech_segs= []
     tot_laugh_only_segs = []
     tot_noise_segs = []
+    tot_overlap = []
 
     general_info_list = []
     # Iterate over all .mrt files
@@ -544,16 +561,18 @@ def create_dfs(file_dir, files):
         general_info_sublist = general_info_to_list(full_path, meeting_id)
         general_info_list += general_info_sublist
 
-        invalid, speech, laugh_only, noise = get_segment_list(full_path, meeting_id)
+        invalid, speech, laugh_only, noise, overlap = get_segment_list(full_path, meeting_id)
         tot_invalid_segs += invalid
         tot_speech_segs += speech 
         tot_laugh_only_segs += laugh_only
         tot_noise_segs += noise
+        tot_overlap += overlap
 
     laugh_only_df = pd.DataFrame(tot_laugh_only_segs)
     invalid_df = pd.DataFrame(tot_invalid_segs )
     speech_df = pd.DataFrame(tot_speech_segs)
     noise_df = pd.DataFrame(tot_noise_segs)
+    overlap_df = pd.DataFrame(tot_overlap)
 
     #TODO 根据textgrid处理dataframe
 

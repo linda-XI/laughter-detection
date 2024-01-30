@@ -191,6 +191,7 @@ if not force_recompute and os.path.isfile(cache_file):
     noise_index = mega_index['noise']
     speech_index = mega_index['speech']
     silence_index = mega_index['silence']
+    overlap_index = mega_index['overlap']
 else:
     print('Creating indices from transcripts...')
     print('(this can take a while)')
@@ -199,6 +200,7 @@ else:
     laugh_index = create_laugh_index(parse.laugh_only_df, invalid_index=invalid_index)
     speech_index = create_index_from_df(parse.speech_df)
     noise_index = create_index_from_df(parse.noise_df)
+    overlap_index = create_index_from_df(parse.overlap_df)
 
     silence_index = create_silence_index(
         laugh_index, invalid_index, noise_index, speech_index
@@ -210,6 +212,7 @@ else:
         "speech": speech_index,
         "noise": noise_index,
         "silence": silence_index,
+        "overlap": overlap_index
     }
 
     # Create .cache dir if it doesn't exist
