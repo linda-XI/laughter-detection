@@ -208,9 +208,9 @@ def get_segment_list(filename, meeting_id):
         if (seg==None): # Skip segment without audio chan
             continue
         # add overlap participants' s laugh into overlap_df
-        print(seg.chan_id)
+        print(seg.part_id)
         print(seg.meeting_id)
-        if meeting_id in testSet and seg.chan_id in overlapPart and seg.type == SegmentType.LAUGH:
+        if meeting_id in testSet and seg.part_id in overlapPart and seg.type == SegmentType.LAUGH:
             overlap_list.append(seg.dict())
 
         if seg.type == SegmentType.LAUGH:
