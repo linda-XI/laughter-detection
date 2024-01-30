@@ -221,7 +221,7 @@ else:
     # The following indices are dicts that contain segments of a particular type per participant per meeting
     invalid_index = create_index_from_df(parse.invalid_df)
     overlap_index = create_index_from_df(parse.overlap_df)
-    laugh_index = create_laugh_index(parse.laugh_only_df, invalid_index=invalid_index)
+    laugh_index = create_laugh_index(parse.laugh_only_df, invalid_index=invalid_index, overlap_index = overlap_index)
     speech_index = create_index_from_df(parse.speech_df)
     noise_index = create_index_from_df(parse.noise_df)
 
