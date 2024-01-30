@@ -140,7 +140,9 @@ def _get_segment_type(xml_seg) -> Tuple[SegmentType, str]:
                     laugh_type = child.get("Description")
                 else:
                     seg_type = SegmentType.INVALID
-
+            elif "pre-meeting" in child.get("Description"):
+                # pre-meeting utterance belongs to invalid, which should not be take into account
+                seg_type = SegmentType.INVALID
             else:
                 seg_type = SegmentType.OTHER_VOCAL
 
