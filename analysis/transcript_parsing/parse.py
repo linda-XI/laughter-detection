@@ -208,6 +208,8 @@ def get_segment_list(filename, meeting_id):
         if (seg==None): # Skip segment without audio chan
             continue
         # add overlap participants' s laugh into overlap_df
+        print(seg.chan_id)
+        print(seg.meeting_id)
         if meeting_id in testSet and seg.chan_id in overlapPart and seg.type == SegmentType.LAUGH:
             overlap_list.append(seg.dict())
 
@@ -505,7 +507,7 @@ def refine_laugh_df(out_path):
         subprocess.run(['mkdir', out_path])
     laugh_only_df = pd.DataFrame(laugh_only_list)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
-    laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv.csv', index=False)
+    laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv', index=False)
 
     speech_df = pd.DataFrame(speech_only_list)
     speech_df.sort_values(by=['meeting_id', 'start'], inplace=True)
