@@ -101,8 +101,10 @@ def create_laugh_index(df, invalid_index, overlap_index):
 
                 # If segment is valid, append to laugh segments index
                 laugh_index = append_to_index(laugh_index, row, meeting_id, part_id)
-                
-        if meeting_id in testSet:
+
+        # check if the meeting_id belongs to the testSet. 
+        # Using overlap_index.keys() because some meetings don't have overlap participant.
+        if meeting_id in overlap_index.keys():
             # If the meeting is in testSet, remove the overlap participants' laughter 
             # from all the participants' laughter in that meeting.
             # because we add extra laugh for each participant.
