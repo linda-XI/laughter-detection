@@ -205,10 +205,12 @@ def get_segment_list(filename, meeting_id):
     # mixed laugh means that the laugh occurred next to speech or any other sound
     for xml_seg in all_segs:
         seg = xml_to_segment(xml_seg, meeting_id)
-        if meeting_id in testSet and seg.chan_id in overlapPart and seg.type == SegmentType.LAUGH:
-            overlap_list.append(seg.dict())
         if (seg==None): # Skip segment without audio chan
             continue
+        # add overlap participants' s laugh into overlap_df
+        if meeting_id in testSet and seg.chan_id in overlapPart and seg.type == SegmentType.LAUGH:
+            overlap_list.append(seg.dict())
+
         if seg.type == SegmentType.LAUGH:
             laugh_only_list.append(seg.dict())
         elif seg.type == SegmentType.SPEECH:
