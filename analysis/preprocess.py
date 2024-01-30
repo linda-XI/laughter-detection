@@ -9,6 +9,8 @@ import pickle
 import os
 from analysis.transcript_parsing import parse
 
+testSet = ["Bns002", "Bns003", "Btr001", "Btr002", "Bns001"]
+overlapPart = ["me011", "fe008"]
 
 def seg_invalid(row):
     """
@@ -46,7 +48,22 @@ def append_to_index(index, row, meeting_id, part_id):
     return index
 
 
-def create_laugh_index(df, invalid_index):
+        
+
+def remove_overlap_from_index(index, overlap_index, meeting_id):
+    '''
+    remove laughter in overlap_index from laughter_index
+    '''
+    for part_id in index[meeting_id].keys():
+        if part_id != 'tot_len' and part_id != 'tot_events':
+            for overlap_part_id in overlapPart:
+                if overlap_part_id in overlap_index[meeting_id].keys():
+                    interval = overlap_index[meeting_id][overlap_part_id]
+                    index[meeting_id][part_id] = index[meeting_id][part_id] - interval
+    return index
+
+
+def create_laugh_index(df, invalid_index, overlap_index):
     """
     Creates a laugh_index with all transcribed laughter events per particpant per meeting
     Invalid index needs to be passed because invalid laughter segments will be added to it
@@ -84,6 +101,12 @@ def create_laugh_index(df, invalid_index):
 
                 # If segment is valid, append to laugh segments index
                 laugh_index = append_to_index(laugh_index, row, meeting_id, part_id)
+                
+        if meeting_id in testSet:
+            # If the meeting is in testSet, remove the overlap participants' laughter 
+            # from all the participants' laughter in that meeting.
+            # because we add extra laugh for each participant.
+            laugh_index = remove_overlap_from_index(laugh_index, overlap_index, meeting_id)
 
     return laugh_index
 
@@ -197,10 +220,10 @@ else:
     print('(this can take a while)')
     # The following indices are dicts that contain segments of a particular type per participant per meeting
     invalid_index = create_index_from_df(parse.invalid_df)
+    overlap_index = create_index_from_df(parse.overlap_df)
     laugh_index = create_laugh_index(parse.laugh_only_df, invalid_index=invalid_index)
     speech_index = create_index_from_df(parse.speech_df)
     noise_index = create_index_from_df(parse.noise_df)
-    overlap_index = create_index_from_df(parse.overlap_df)
 
     silence_index = create_silence_index(
         laugh_index, invalid_index, noise_index, speech_index
