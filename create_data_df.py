@@ -19,13 +19,16 @@ PARTITIONS = {
         "Bmr001", "Bmr002", "Bmr003", "Bmr005", "Bmr006", "Bmr007", "Bmr008", "Bmr009",
         "Bmr010", "Bmr011", "Bmr012", "Bmr014", "Bmr015", "Bmr016", "Bmr019", "Bmr020",
         "Bmr022", "Bmr023", "Bmr024", "Bmr025", "Bmr026", "Bmr027", "Bmr028", "Bmr029",
-        "Bmr030", "Bmr031", "Bns002", "Bns003", "Bro003", "Bro004", "Bro005", "Bro007",
+        "Bmr030", "Bmr031", "Bro003", "Bro004", "Bro005", "Bro007",
         "Bro008", "Bro010", "Bro011", "Bro012", "Bro013", "Bro014", "Bro015", "Bro016",
         "Bro017", "Bro018", "Bro019", "Bro022", "Bro023", "Bro024", "Bro025", "Bro026",
-        "Bro027", "Bro028", "Bsr001", "Btr001", "Btr002", "Buw001",
+        "Bro027", "Bro028", "Bsr001", "Buw001", "Bmr013", "Bmr018", "Bro021", "Bmr021"
     ],
-    'dev': ["Bmr021", "Bns001"],
-    'test': ["Bmr013", "Bmr018", "Bro021"]
+    # 'dev': ["Bmr021", "Bns001"],
+    # 'test': ["Bmr013", "Bmr018", "Bro021"]
+    'dev': ["Bns002", "Bns003"],
+    'test': ["Bns001", "Btr002", "Btr001"]
+    
 }
 
 
@@ -97,6 +100,7 @@ def get_random_segment_from_df(duration, meeting_id, df):
 def get_subsample(start, duration, subsample_duration):
     '''
     Take a segment defined by (start, duration) and return a subsample of passed duration within that region
+    input:sub_start, sub_duration = get_subsample(laugh_seg.start, laugh_seg.length, cfg['train']['subsample_duration'])
     '''
     # Taking min is important because otherwise the subsample start can fall out of the range of the laughter
     # and even get negative (e.g. if start=0.1, duration=0.5 -> 0.1+0.5-1.0 = -0.4)
