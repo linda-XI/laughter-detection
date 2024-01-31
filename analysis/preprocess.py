@@ -63,7 +63,7 @@ def remove_overlap_from_index(index, overlap_index, meeting_id):
     return index
 
 
-def create_laugh_index(df, invalid_index, overlap_index):
+def create_laugh_index(df, invalid_index):
     """
     Creates a laugh_index with all transcribed laughter events per particpant per meeting
     Invalid index needs to be passed because invalid laughter segments will be added to it
@@ -104,11 +104,11 @@ def create_laugh_index(df, invalid_index, overlap_index):
 
         # check if the meeting_id belongs to the testSet. 
         # Using overlap_index.keys() because some meetings don't have overlap participant.
-        if meeting_id in overlap_index.keys():
+        # if meeting_id in overlap_index.keys():
             # If the meeting is in testSet, remove the overlap participants' laughter 
             # from all the participants' laughter in that meeting.
             # because we add extra laugh for each participant.
-            laugh_index = remove_overlap_from_index(laugh_index, overlap_index, meeting_id)
+            # laugh_index = remove_overlap_from_index(laugh_index, overlap_index, meeting_id)
 
     return laugh_index
 
@@ -223,7 +223,7 @@ else:
     # The following indices are dicts that contain segments of a particular type per participant per meeting
     invalid_index = create_index_from_df(parse.invalid_df)
     overlap_index = create_index_from_df(parse.overlap_df)
-    laugh_index = create_laugh_index(parse.laugh_only_df, invalid_index=invalid_index, overlap_index = overlap_index)
+    laugh_index = create_laugh_index(parse.laugh_only_df, invalid_index=invalid_index)
     speech_index = create_index_from_df(parse.speech_df)
     noise_index = create_index_from_df(parse.noise_df)
 
