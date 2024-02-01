@@ -101,9 +101,9 @@ def create_manifest(audio_dir, transcripts_dir, output_dir, force_manifest_reloa
 
             # Write to output directory if a path is provided
             if output_dir is not None:
-                audio_part.to_file(output_dir / f"icsi-ihm_recordings_{part}.jsonl.gz")
-                supervision_part.to_file(
-                    output_dir / f"icsi-ihm_supervisions_{part}.jsonl.gz"
+                audio_part.to_file(os.path.join(output_dir, f"icsi-ihm_recordings_{part}.jsonl.gz"))
+                supervision_part.to_file(os.path.join(
+                    output_dir, f"icsi-ihm_supervisions_{part}.jsonl.gz")  
                 )
 
             # Combine all manifests into one dictionary
