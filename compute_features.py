@@ -108,8 +108,9 @@ def create_manifest(audio_dir, transcripts_dir, output_dir, force_manifest_reloa
 
             # Combine all manifests into one dictionary
             manifests[part] = {"recordings": audio_part, "supervisions": supervision_part}
+            icsi = dict(manifests)
 
-    return dict(manifests)
+    return icsi
 
     # return icsi
 
