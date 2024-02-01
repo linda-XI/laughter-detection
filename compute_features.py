@@ -22,6 +22,8 @@ import torch
 from lhotse import CutSet 
 from lhotse.recipes import prepare_icsi
 from lhotse import SupervisionSegment, RecordingSet
+from lhotse.qa import fix_manifests
+from lhotse import validate_recordings_and_supervisions
 import pandas as pd
 import pickle
 import os
@@ -34,10 +36,27 @@ from analysis.transcript_parsing import parse
 from analysis.utils import to_frames
 import config as cfg
 import portion as P
-
+from collections import defaultdict
 
 SPLITS = ['train', 'dev', 'test']
-
+PARTITIONS = {
+    'train': [
+        "Bdb001", "Bed002", "Bed003", "Bed004", "Bed005", "Bed006", "Bed008", "Bed009",
+        "Bed010", "Bed011", "Bed012", "Bed013", "Bed014", "Bed015", "Bed016", "Bed017",
+        "Bmr001", "Bmr002", "Bmr003", "Bmr005", "Bmr006", "Bmr007", "Bmr008", "Bmr009",
+        "Bmr010", "Bmr011", "Bmr012", "Bmr014", "Bmr015", "Bmr016", "Bmr019", "Bmr020",
+        "Bmr022", "Bmr023", "Bmr024", "Bmr025", "Bmr026", "Bmr027", "Bmr028", "Bmr029",
+        "Bmr030", "Bmr031", "Bro003", "Bro004", "Bro005", "Bro007",
+        "Bro008", "Bro010", "Bro011", "Bro012", "Bro013", "Bro014", "Bro015", "Bro016",
+        "Bro017", "Bro018", "Bro019", "Bro022", "Bro023", "Bro024", "Bro025", "Bro026",
+        "Bro027", "Bro028", "Bsr001", "Buw001", "Bmr013", "Bmr018", "Bro021", "Bmr021"
+    ],
+    # 'dev': ["Bmr021", "Bns001"],
+    # 'test': ["Bmr013", "Bmr018", "Bro021"]
+    'dev': ["Bns002", "Bns003"],
+    'test': ["Bns001", "Btr002", "Btr001"]
+    
+}
 
 def create_manifest(audio_dir, transcripts_dir, output_dir, force_manifest_reload=False):
     '''
@@ -64,10 +83,35 @@ def create_manifest(audio_dir, transcripts_dir, output_dir, force_manifest_reloa
             #     output_dir, f'supervisions_{split}.jsonl'))
             # icsi[split]['supervisions'] = sup_set
     else:
-        icsi = prepare_icsi(
-            audio_dir=audio_dir, transcripts_dir=transcripts_dir, output_dir=output_dir)
+        # icsi = prepare_icsi(
+        #     audio_dir=audio_dir, transcripts_dir=transcripts_dir, output_dir=output_dir)
+        audio, supervision = prepare_icsi(
+        audio_dir=audio_dir, transcripts_dir=transcripts_dir, output_dir=output_dir)
+        manifests = defaultdict(dict)
 
-    return icsi
+        for part in ["train", "dev", "test"]:
+        # Get recordings for current data split
+            audio_part = audio.filter(lambda x: x.id in PARTITIONS[part])
+            supervision_part = supervision.filter(
+                lambda x: x.recording_id in PARTITIONS[part]
+            )
+
+            audio_part, supervision_part = fix_manifests(audio_part, supervision_part)
+            validate_recordings_and_supervisions(audio_part, supervision_part)
+
+            # Write to output directory if a path is provided
+            if output_dir is not None:
+                audio_part.to_file(output_dir / f"icsi-ihm_recordings_{part}.jsonl.gz")
+                supervision_part.to_file(
+                    output_dir / f"icsi-ihm_supervisions_{part}.jsonl.gz"
+                )
+
+            # Combine all manifests into one dictionary
+            manifests[part] = {"recordings": audio_part, "supervisions": supervision_part}
+
+    return dict(manifests)
+
+    # return icsi
 
 def compute_features_per_split(icsi_manifest, output_dir, num_jobs=8, use_kaldi=False, force_recompute=False):
     '''
