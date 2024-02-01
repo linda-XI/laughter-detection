@@ -163,7 +163,7 @@ def compute_features_for_cuts(icsi_manifest, data_dfs_dir, output_dir, split_fea
             chan_id = chan_idx_map[meeting_id][chan_name]
             # Get track for this particular channel in this meeting
             # [0] because we know that only one meeting will match this query
-            print(meeting_id+" "+chan_id)
+            print(meeting_id+" "+str(chan_id))
             row_track = split_feat_cutsets[split].filter(lambda c: (c.id.startswith(meeting_id) and c.channel == chan_id))[0]
 
             # Get a cut that represents the subsample from this track
