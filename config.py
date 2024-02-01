@@ -255,7 +255,7 @@ ANALYSIS= {
     "test_df_dir": str(root_path / 'seedModel/testDF'),
     # dataframe are loaded from disk if possible. This option forces re-computation 
     # If True analyse.py will take a lot longer
-    "force_df_recompute": True
+    "force_df_recompute": False
 }
 
 ANALYSIS['model'] = {
