@@ -406,6 +406,7 @@ def update_laugh_only_df(path):
 
                 i, j = 0, 0  
                 while i < len(laugh_only_df) and j < len(textgrid_df):
+                    
                     if(textgrid_df.iloc[j]['meeting_id'] == laugh_only_df.iloc[i]['meeting_id']):
                         # 获取当前行的 'start' 值
                         start_total = laugh_only_df.iloc[i]['start']
@@ -415,7 +416,7 @@ def update_laugh_only_df(path):
                         diff = abs(start_new - start_total)
                         # print(diff)
 
-                        # 如果 'start_new' 与 'start_total' 之差小于 0.2，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
+                        # 如果 'start_new' 与 'start_total' 之差小于 1，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
                         if ((diff < 1)  
                             and (textgrid_df.iloc[j]['chan_id'] != laugh_only_df.iloc[i]['chan_id'])):
                             
@@ -584,6 +585,8 @@ def create_dfs(file_dir, files):
     info_df = pd.DataFrame(general_info_list, columns=info_cols)
     info_df = info_df.astype(dtype=info_dtypes)
 
+    info_df.to_csv(cfg['test_df_dir'] + '/info_df.csv', index=False)
+
 
 def parse_transcripts(path):
     """
@@ -652,4 +655,20 @@ if __name__ == "__main__":
 # EXECUTED ON IMPORT
 #############################################
 # Parse transcripts on import
-parse_transcripts(cfg['transcript_dir'])
+
+
+file_path = cfg['test_df_dir']
+force_recompute = cfg['force_df_recompute']
+
+if not force_recompute and os.path.isdir(file_path):
+    print('==========================\nLOADING INDICES FROM DISK\nTo recompute set `force_index_recompute=True` in config.py\n')
+    parse_preambles(os.path.join(cfg['transcript_dir'], "preambles.mrt"))
+    laugh_only_df = pd.read_csv(cfg['test_df_dir'] + '/test_laugh_only_df.csv')  
+    invalid_df = pd.read_csv(cfg['test_df_dir'] + '/test_invalid_df.csv') 
+    noise_df = pd.read_csv(cfg['test_df_dir'] + '/test_noise_df.csv')    
+    speech_df = pd.read_csv(cfg['test_df_dir'] + '/test_speech_df.csv')
+    overlap_df = pd.read_csv(cfg['test_df_dir'] + '/overlap_df.csv')
+    info_df = pd.read_csv(cfg['test_df_dir'] + '/info_df.csv')
+    
+else:
+    parse_transcripts(cfg['transcript_dir'])
