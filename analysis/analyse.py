@@ -15,6 +15,8 @@ from analysis.transcript_parsing import parse
 import analysis.preprocess as prep
 import analysis.utils as utils
 
+testSet = ["Bns002", "Bns003", "Btr001", "Btr002", "Bns001"]
+overlapPart = ["me011", "fe008"]
 ##################################################
 # PARSE TEXTGRID
 ##################################################
@@ -102,6 +104,40 @@ def get_params_from_path(path):
 ##################################################
 # ANALYSE
 ##################################################
+#########################remove overlap participant's laugh in testset##############################
+def remove_overlapPart(meeting_id, part_id):
+    '''
+    remove laughter in overlap_index from laughter_index
+    '''
+    interval = P.empty()
+    # check if the meeting_id belongs to the testSet. 
+    # Using overlap_index.keys() because some meetings don't have overlap participant.
+    if meeting_id in prep.overlap_index.keys() and part_id in overlapPart:
+        if part_id in prep.overlap_index[meeting_id].keys():
+            # the laughter from overlap participant in the test set which need to be removed from current true laugh
+            interval = prep.overlap_index[meeting_id][part_id]
+    return interval
+
+def seg_index_overlap_laugh(index, segment, meeting_id, part_id):
+    '''
+    Returns the time [in s] the passed segment overlaps with the given index
+    Returns 0 if no overlap.
+
+    params: segment: an interval as defined by the portion library
+    '''
+    if part_id not in index[meeting_id].keys():
+        # No segments transcribed for this participant => no overlap 
+        return 0
+    
+    interval = remove_overlapPart(meeting_id, part_id)   
+
+    # Get overlap by taking the intersection (&)
+    overlap = (index[meeting_id][part_id] - interval) & segment
+    overlap_time = utils.to_sec(utils.p_len(overlap))
+    
+
+    return overlap_time
+#########################^^^^remove overlap participant's laugh in testset^^^^##############################
 
 def seg_index_overlap(index, segment, meeting_id, part_id):
     '''
@@ -118,6 +154,7 @@ def seg_index_overlap(index, segment, meeting_id, part_id):
     # Get overlap by taking the intersection (&)
     overlap = index[meeting_id][part_id] & segment
     overlap_time = utils.to_sec(utils.p_len(overlap))
+    
 
     return overlap_time
 
@@ -133,13 +170,18 @@ def laugh_match(pred_laugh, meeting_id, part_id):
     if part_id in prep.invalid_index[meeting_id].keys():
         # Remove laughter occurring in mixed settings because we don't evaluate them
         pred_laugh = pred_laugh - prep.invalid_index[meeting_id][part_id]
+    #remove overlap participant in testSet
+    overlap_part_interval = remove_overlapPart(meeting_id, part_id)
+    pred_laugh = pred_laugh - overlap_part_interval
 
     pred_length = utils.to_sec(utils.p_len(pred_laugh))
 
     correct = 0 
     incorrect = pred_length
     if part_id in prep.laugh_index[meeting_id].keys():
-        correct = seg_index_overlap(prep.laugh_index, pred_laugh, meeting_id, part_id)
+        # correct = seg_index_overlap(prep.laugh_index, pred_laugh, meeting_id, part_id)
+        # seg_index_overlap_laugh resonsible for remove overlap participant in testSet 
+        correct = seg_index_overlap_laugh(prep.laugh_index, pred_laugh, meeting_id, part_id)
         incorrect = pred_length - correct
 
     # Get type of misclassification 
