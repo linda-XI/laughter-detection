@@ -204,7 +204,8 @@ def create_silence_index(laugh_index, invalid_index, noise_index, speech_index):
 Load from disk if possible. o/w create indices from scratch
 '''
 
-cache_file = ".cache/preprocessed_indices.pkl"
+# cache_file = ".cache/preprocessed_indices.pkl"
+cache_file = cfg['cache_file']
 force_recompute = cfg['force_index_recompute']
 
 if not force_recompute and os.path.isfile(cache_file):

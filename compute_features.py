@@ -173,6 +173,7 @@ def compute_features_for_cuts(icsi_manifest, data_dfs_dir, output_dir, split_fea
 
     feats_dir = os.path.join(output_dir, 'feats')
     cutset_dir = os.path.join(output_dir, 'cutsets')
+    print(cutset_dir)
     # Create directory for storing lhotse cutsets
     # Feats dir is automatically created by lhotse
     subprocess.run(['mkdir', '-p', cutset_dir])
