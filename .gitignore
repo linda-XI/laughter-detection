@@ -14,7 +14,7 @@ preprocess_output/*
 
 output/*
 eval/*
-seedModel/*
+seedModel/
 
 
 # Vim configs

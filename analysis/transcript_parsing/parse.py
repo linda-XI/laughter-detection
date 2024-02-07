@@ -370,7 +370,7 @@ def delete_from_df(non_laugh_df, laugh_portion):
     return portion
 
 
-def update_laugh_only_df(path):
+def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
     '''
         Add extra laugh into laugh_only_df
         a channel can heard oter channels'laugh. 
@@ -395,9 +395,9 @@ def update_laugh_only_df(path):
         #print(f'Evaluating meeting {meeting}...')
         meeting_path = os.path.join(path, meeting)
         # meeting_id = meeting_path.split("/")[-1]
-        threshold_dir = os.path.join(meeting_path, 't_0.8')
+        threshold_dir = os.path.join(meeting_path, 't_'+str(threshold))
         #textgrid_dir: dir that contains all channel textgrid of a meeting
-        textgrid_dir = os.path.join(threshold_dir, 'l_0.2')
+        textgrid_dir = os.path.join(threshold_dir, 'l_'+str(minLen))
         for filename in os.listdir(textgrid_dir):
             if filename.endswith('.TextGrid'):
                 full_path = os.path.join(textgrid_dir, filename)
@@ -601,7 +601,7 @@ def parse_transcripts(path):
 
     transc_files = get_transcripts(path)
     create_dfs(path, transc_files)
-    update_laugh_only_df(cfg['extra_laugh_dir'])
+    update_laugh_only_df(cfg['extra_laugh_dir'], cfg['threshold'], cfg['minLen'])
     refine_laugh_df(cfg['test_df_dir'])
 
 
