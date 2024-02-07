@@ -400,6 +400,7 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
         textgrid_dir = os.path.join(threshold_dir, 'l_'+str(minLen))
         for filename in os.listdir(textgrid_dir):
             if filename.endswith('.TextGrid'):
+                chan_id = filename.split('.')[0]
                 full_path = os.path.join(textgrid_dir, filename)
                 #one channel one df
                 textgrid_df = textgrid_to_df(full_path)
@@ -417,8 +418,12 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
                         # print(diff)
 
                         # 如果 'start_new' 与 'start_total' 之差小于 1，且属于同一个meeting，且不是同一个人发出的。则添加新的行到总的 DataFrame 中
+                        # TODO 
+                        # if ((diff < 1)  
+                        #     and (textgrid_df.iloc[j]['chan_id'] != laugh_only_df.iloc[i]['chan_id'])):
                         if ((diff < 1)  
-                            and (textgrid_df.iloc[j]['chan_id'] != laugh_only_df.iloc[i]['chan_id'])):
+                            and (textgrid_df.iloc[j]['chan_id'] == chan_id)
+                            and (chan_id != laugh_only_df.iloc[i]['chan_id'])):
                             
                             new_row = pd.DataFrame({
                                 'meeting_id': textgrid_df.iloc[j]['meeting_id'],
@@ -442,8 +447,14 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
             
         # if not os.path.isdir(f'{os.path.dirname(__file__)}/.cache'):
             # subprocess.run(['mkdir', '.cache'])
+    
     laugh_only_df = pd.concat([laugh_only_df, temp_laugh_df], ignore_index=True)
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+
+    if not (os.path.isdir(cfg["extra_laugh_sample"])):
+        os.mkdir(cfg["extra_laugh_sample"]) 
+    temp_laugh_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    temp_laugh_df.to_csv(cfg["extra_laugh_sample"] + '/extra_laugh_'+str(threshold)+'_'+str(minLen)+'.csv', index=False)
 
 def refine_laugh_df(out_path):
     '''refine each channel's df to delete the overlap of laughter between rows using portion library.

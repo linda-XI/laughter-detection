@@ -253,6 +253,7 @@ ANALYSIS= {
     #store all the predict laugh from seed model 
     "extra_laugh_dir": str(root_path / 'seedModel/predTrain'),
     "test_df_dir": str(root_path / 'seedModel/testDF'),
+    "extra_laugh_sample": str(root_path / 'sample/extra_laugh_sample'),
     # adding extra laugh into laugh_only_df with given threshold and minLen
     "threshold": 0.8,
     "minLen": 0.2,
