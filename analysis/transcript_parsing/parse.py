@@ -148,9 +148,9 @@ def _get_segment_type(xml_seg) -> Tuple[SegmentType, str]:
                     laugh_type = child.get("Description")
                 else:
                     seg_type = SegmentType.INVALID
-            elif "pre-meeting" in child.get("Description"):
+            # elif "pre-meeting" in child.get("Description"):
                 # pre-meeting utterance belongs to invalid, which should not be take into account
-                seg_type = SegmentType.INVALID
+                # seg_type = SegmentType.INVALID
             else:
                 seg_type = SegmentType.OTHER_VOCAL
 
@@ -401,6 +401,9 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
         for filename in os.listdir(textgrid_dir):
             if filename.endswith('.TextGrid'):
                 chan_id = filename.split('.')[0]
+
+                print(chan_id)
+                
                 full_path = os.path.join(textgrid_dir, filename)
                 #one channel one df
                 textgrid_df = textgrid_to_df(full_path)
@@ -408,7 +411,8 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
                 i, j = 0, 0  
                 while i < len(laugh_only_df) and j < len(textgrid_df):
                     
-                    if(textgrid_df.iloc[j]['meeting_id'] == laugh_only_df.iloc[i]['meeting_id']):
+                    if((textgrid_df.iloc[j]['meeting_id'] == laugh_only_df.iloc[i]['meeting_id'])
+                        and (textgrid_df.iloc[j]['chan_id'] == chan_id)):
                         # 获取当前行的 'start' 值
                         start_total = laugh_only_df.iloc[i]['start']
                         start_new = textgrid_df.iloc[j]['start']
@@ -422,7 +426,6 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
                         # if ((diff < 1)  
                         #     and (textgrid_df.iloc[j]['chan_id'] != laugh_only_df.iloc[i]['chan_id'])):
                         if ((diff < 1)  
-                            and (textgrid_df.iloc[j]['chan_id'] == chan_id)
                             and (chan_id != laugh_only_df.iloc[i]['chan_id'])):
                             
                             new_row = pd.DataFrame({
@@ -612,8 +615,8 @@ def parse_transcripts(path):
 
     transc_files = get_transcripts(path)
     create_dfs(path, transc_files)
-    update_laugh_only_df(cfg['extra_laugh_dir'], cfg['threshold'], cfg['minLen'])
-    refine_laugh_df(cfg['test_df_dir'])
+    # update_laugh_only_df(cfg['extra_laugh_dir'], cfg['threshold'], cfg['minLen'])
+    # refine_laugh_df(cfg['test_df_dir'])
 
 
 def _print_stats(df):
