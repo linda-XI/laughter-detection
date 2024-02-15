@@ -685,5 +685,5 @@ if not force_recompute and os.path.isdir(file_path):
     info_df = pd.read_csv(cfg['test_df_dir'] + '/info_df.csv')
     
 else:
-    # os.mkdir(file_path)
+    os.mkdir(file_path)
     parse_transcripts(cfg['transcript_dir'])
