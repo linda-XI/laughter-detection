@@ -43,7 +43,7 @@ def create_inference_dataloader(audio_path):
     '''
     rec = Recording.from_file(audio_path)
     cut = MonoCut(id='inference-cut', start=0.0, duration=rec.duration, channel=0, recording=rec)
-
+    # utils.get_feat_extractor
     extractor = get_feat_extractor(num_samples=cfg.FEAT['num_samples'], num_filters=cfg.FEAT['num_filters'])
     # f2 = Fbank(FbankConfig(num_filters=128, frame_shift=0.02275))
     feats_all = cut.compute_features(extractor)

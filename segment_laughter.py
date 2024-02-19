@@ -130,6 +130,7 @@ def load_and_pred(audio_path, full_output_dir):
     # probs = laugh_segmenter.lowpass(probs)
 
     # Get a list of instance for each setting passed in  
+    # compare predict with labels
     instance_dict = laugh_segmenter.get_laughter_instances(
         probs, thresholds=thresholds, min_lengths=min_lengths, fps=fps)
 

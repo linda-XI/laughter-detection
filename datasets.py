@@ -84,6 +84,7 @@ class InferenceDataset(torch.utils.data.Dataset):
         return len(self.feats)
 
     def __getitem__(self, index):
+        # cut the whole meeting into samples
         ret = self.feats[index:index+self.n_frames]
         # If we get to the end of the audio sample we need to pad to keep 
         # the sample number at 100
