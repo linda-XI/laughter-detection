@@ -686,4 +686,6 @@ if not force_recompute and os.path.isdir(file_path):
     
 else:
     os.mkdir(file_path)
+
     parse_transcripts(cfg['transcript_dir'])
+#testtest
