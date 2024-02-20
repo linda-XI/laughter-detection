@@ -688,4 +688,4 @@ else:
     os.mkdir(file_path)
 
     parse_transcripts(cfg['transcript_dir'])
-#testtest
+
