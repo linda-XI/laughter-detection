@@ -519,25 +519,39 @@ def refine_laugh_df(out_path):
     if not os.path.isdir(out_path):
         subprocess.run(['mkdir', out_path])
     laugh_only_df = pd.DataFrame(laugh_only_list)
-    laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
-    laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv', index=False)
+    # laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    # laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv', index=False)
 
     speech_df = pd.DataFrame(speech_only_list)
-    speech_df.sort_values(by=['meeting_id', 'start'], inplace=True)
-    speech_df.to_csv(out_path + '/test_speech_df.csv', index=False)
+    # speech_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    # speech_df.to_csv(out_path + '/test_speech_df.csv', index=False)
 
     invalid_df = pd.DataFrame(invalid_only_list)
-    invalid_df.sort_values(by=['meeting_id', 'start'], inplace=True)
-    invalid_df.to_csv(out_path + '/test_invalid_df.csv', index=False)
+    # invalid_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    # invalid_df.to_csv(out_path + '/test_invalid_df.csv', index=False)
 
     noise_df = pd.DataFrame(noise_only_list)
-    noise_df.sort_values(by=['meeting_id', 'start'], inplace=True)
-    noise_df.to_csv(out_path + '/test_noise_df.csv', index=False)
+    # noise_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    # noise_df.to_csv(out_path + '/test_noise_df.csv', index=False)
 
     
-    overlap_df.to_csv(out_path + '/overlap_df.csv', index=False)
+    # overlap_df.to_csv(out_path + '/overlap_df.csv', index=False)
+    store_df(out_path)
 
     return laugh_only_df, speech_df, noise_df, speech_df
+
+def store_df(out_path):
+    global laugh_only_df, invalid_df, noise_df, speech_df, overlap_df
+
+    laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv', index=False)
+    speech_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    speech_df.to_csv(out_path + '/test_speech_df.csv', index=False)
+    invalid_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    invalid_df.to_csv(out_path + '/test_invalid_df.csv', index=False)
+    noise_df.sort_values(by=['meeting_id', 'start'], inplace=True)
+    noise_df.to_csv(out_path + '/test_noise_df.csv', index=False)
+    overlap_df.to_csv(out_path + '/overlap_df.csv', index=False)
 
 
 #----------------------------------------------------------------------------#
@@ -600,6 +614,7 @@ def create_dfs(file_dir, files):
     info_df = info_df.astype(dtype=info_dtypes)
 
     info_df.to_csv(cfg['test_df_dir'] + '/info_df.csv', index=False)
+    store_df(cfg['test_df_dir'])
 
 
 def parse_transcripts(path):
