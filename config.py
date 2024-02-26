@@ -260,7 +260,7 @@ ANALYSIS= {
     # dataframe are loaded from disk if possible. This option forces re-computation 
     # If True analyse.py will take a lot longer
     "force_df_recompute": False,
-    "cache_file" : ".cache/preprocessed_indices1.pkl"
+    "cache_file" : ".cache/preprocessed_indices_base.pkl"
 }
 
 ANALYSIS['model'] = {
