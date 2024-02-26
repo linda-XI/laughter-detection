@@ -690,7 +690,7 @@ file_path = cfg['test_df_dir']
 force_recompute = cfg['force_df_recompute']
 
 if not force_recompute and os.path.isdir(file_path):
-    print('==========================\nLOADING INDICES FROM DISK\nTo recompute set `force_index_recompute=True` in config.py\n')
+    print('==========================\nLOADING DF FROM DISK\nTo recompute set `force_index_recompute=True` in config.py\n')
     parse_preambles(os.path.join(cfg['transcript_dir'], "preambles.mrt"))
     laugh_only_df = pd.read_csv(cfg['test_df_dir'] + '/test_laugh_only_df.csv')  
     invalid_df = pd.read_csv(cfg['test_df_dir'] + '/test_invalid_df.csv') 
@@ -701,5 +701,6 @@ if not force_recompute and os.path.isdir(file_path):
     
 else:
     #test
+    print('==========================\nCompute DF\n')
     os.mkdir(file_path)
     parse_transcripts(cfg['transcript_dir'])
