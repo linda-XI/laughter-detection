@@ -5,6 +5,7 @@ data/icsi/*
 data/fix_manifest/*
 data/fix_splitFeat/*
 data/manifest/*
+data/
 results/*
 analysis/transcript_parsing/data/*
 data/splitFeat/*
