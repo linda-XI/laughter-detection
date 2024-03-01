@@ -717,7 +717,7 @@ if __name__ == "__main__":
 df_path = cfg['test_df_dir']
 threshold = cfg['threshold']
 min_len = cfg['minLen']
-df_path = os.path.join(df_path, (threshold + "_" + min_len))
+df_path = os.path.join(df_path, (str(threshold) + "_" + str(min_len)))
 force_recompute = cfg['force_df_recompute']
 
 if not force_recompute and os.path.isdir(df_path):
