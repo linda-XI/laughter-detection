@@ -733,5 +733,5 @@ if not force_recompute and os.path.isdir(df_path):
 else:
     #test
     print('==========================\nCompute DF\n')
-    os.mkdir(df_path)
+    os.makedirs(df_path)
     parse_transcripts(cfg['transcript_dir'], df_path)
