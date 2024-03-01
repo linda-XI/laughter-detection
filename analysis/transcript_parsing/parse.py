@@ -370,7 +370,7 @@ def delete_from_df(non_laugh_df, laugh_portion):
     return portion
 
 
-def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
+def update_laugh_only_df(path, threshold, minLen):
     '''
         Add extra laugh into laugh_only_df
         a channel can heard oter channels'laugh. 
@@ -459,7 +459,7 @@ def update_laugh_only_df(path, threshold = 0.8, minLen = 0.2):
     temp_laugh_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     temp_laugh_df.to_csv(cfg["extra_laugh_sample"] + '/' + str(threshold)+'_'+str(minLen)+'.csv', index=False)
 
-def refine_laugh_df(out_path, threshold, min_len):
+def refine_laugh_df(out_path):
     '''refine each channel's df to delete the overlap of laughter between rows using portion library.
        remove extra laugh from speech only df and so on.
     '''
@@ -536,13 +536,13 @@ def refine_laugh_df(out_path, threshold, min_len):
 
     
     # overlap_df.to_csv(out_path + '/overlap_df.csv', index=False)
-    store_df(out_path, threshold, min_len)
+    store_df(out_path)
 
     return laugh_only_df, speech_df, noise_df, speech_df
 
-def store_df(out_path, threshold, min_len):
+def store_df(out_path):
     global laugh_only_df, invalid_df, noise_df, speech_df, overlap_df
-    out_path = os.path.join(out_path, (threshold + "_" + min_len))
+    # out_path = os.path.join(out_path, (threshold + "_" + min_len))
 
     laugh_only_df.sort_values(by=['meeting_id', 'start'], inplace=True)
     laugh_only_df.to_csv(out_path + '/test_laugh_only_df.csv', index=False)
@@ -557,7 +557,7 @@ def store_df(out_path, threshold, min_len):
 
 #----------------------------------------------------------------------------#
 
-def create_dfs(file_dir, files):
+def create_dfs(file_dir, files, df_path):
     """
     Creates four segment-dataframes and one info-dataframe:
         1) laugh_only_df: dataframe containing laughter only snippets
@@ -614,11 +614,11 @@ def create_dfs(file_dir, files):
     info_df = pd.DataFrame(general_info_list, columns=info_cols)
     info_df = info_df.astype(dtype=info_dtypes)
 
-    info_df.to_csv(cfg['test_df_dir'] + '/info_df.csv', index=False)
+    info_df.to_csv(df_path + '/info_df.csv', index=False)
     # store_df(cfg['test_df_dir'], cfg['threshold'], cfg['minLen'])
 
 
-def parse_transcripts(path):
+def parse_transcripts(path, df_path):
     """
     Function executed on import of this module.
     Parses transcripts (including preamble.mrt) and creates:
@@ -630,9 +630,9 @@ def parse_transcripts(path):
     parse_preambles(os.path.join(path, "preambles.mrt"))
 
     transc_files = get_transcripts(path)
-    create_dfs(path, transc_files)
+    create_dfs(path, transc_files, df_path)
     update_laugh_only_df(cfg['extra_laugh_dir'], cfg['threshold'], cfg['minLen'])
-    refine_laugh_df(cfg['test_df_dir'])
+    refine_laugh_df(df_path)
 
 
 def _print_stats(df):
@@ -682,7 +682,11 @@ def main():
     NOT on import
     """
     file_path = os.path.join(os.path.dirname(__file__), "data")
-    parse_transcripts(file_path)
+    df_path = cfg['test_df_dir']
+    threshold = cfg['threshold']
+    min_len = cfg['minLen']
+    df_path = os.path.join(df_path, (threshold + "_" + min_len))
+    parse_transcripts(file_path, df_path)
 
     print("\n----INALID SEGMENTS-----")
     _print_stats(invalid_df)
@@ -710,21 +714,24 @@ if __name__ == "__main__":
 # Parse transcripts on import
 
 
-file_path = cfg['test_df_dir']
+df_path = cfg['test_df_dir']
+threshold = cfg['threshold']
+min_len = cfg['minLen']
+df_path = os.path.join(df_path, (threshold + "_" + min_len))
 force_recompute = cfg['force_df_recompute']
 
-if not force_recompute and os.path.isdir(file_path):
+if not force_recompute and os.path.isdir(df_path):
     print('==========================\nLOADING DF FROM DISK\nTo recompute set `force_index_recompute=True` in config.py\n')
     parse_preambles(os.path.join(cfg['transcript_dir'], "preambles.mrt"))
-    laugh_only_df = pd.read_csv(cfg['test_df_dir'] + '/test_laugh_only_df.csv')  
-    invalid_df = pd.read_csv(cfg['test_df_dir'] + '/test_invalid_df.csv') 
-    noise_df = pd.read_csv(cfg['test_df_dir'] + '/test_noise_df.csv')    
-    speech_df = pd.read_csv(cfg['test_df_dir'] + '/test_speech_df.csv')
-    overlap_df = pd.read_csv(cfg['test_df_dir'] + '/overlap_df.csv')
-    info_df = pd.read_csv(cfg['test_df_dir'] + '/info_df.csv')
+    laugh_only_df = pd.read_csv(df_path + '/test_laugh_only_df.csv')  
+    invalid_df = pd.read_csv(df_path + '/test_invalid_df.csv') 
+    noise_df = pd.read_csv(df_path + '/test_noise_df.csv')    
+    speech_df = pd.read_csv(df_path + '/test_speech_df.csv')
+    overlap_df = pd.read_csv(df_path + '/overlap_df.csv')
+    info_df = pd.read_csv(df_path + '/info_df.csv')
     
 else:
     #test
     print('==========================\nCompute DF\n')
-    os.mkdir(file_path)
-    parse_transcripts(cfg['transcript_dir'])
+    os.mkdir(df_path)
+    parse_transcripts(cfg['transcript_dir'], df_path)
