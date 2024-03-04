@@ -262,8 +262,8 @@ ANALYSIS= {
     # If True analyse.py will take a lot longer
     "force_df_recompute": False,
     "cache_file" : ".cache/preprocessed_indices_extraonly.pkl",
-    "output_dir" : "output/0400_output",
-    "data_dfs_dir" : "./data/icsi/0400_data_dfs"
+    "output_dir" : "output/extraonly_output",
+    "data_dfs_dir" : "./data/icsi/extraonly_data_dfs"
 }
 
 ANALYSIS['model'] = {
