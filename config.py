@@ -252,16 +252,16 @@ ANALYSIS= {
     "force_index_recompute": False,
     #store all the predict laugh from seed model 
     "extra_laugh_dir": str(root_path / 'seedModel/newPredTrain'),
-    "test_df_dir": str(root_path / 'seedModel/extraDF'),
+    "test_df_dir": str(root_path / 'seedModel/extraonlyDF'),
     # "extra_laugh_sample": str(root_path / 'sample/extra_laugh_sample'),
     "extra_laugh_sample": str(root_path / 'seedModel/extraLaughSample'),
     # adding extra laugh into laugh_only_df with given threshold and minLen
     "threshold": 0.8,
-    "minLen": 0.0,
+    "minLen": 0.2,
     # dataframe are loaded from disk if possible. This option forces re-computation 
     # If True analyse.py will take a lot longer
     "force_df_recompute": False,
-    "cache_file" : ".cache/preprocessed_indices_0800.pkl"
+    "cache_file" : ".cache/preprocessed_indices_extraonly.pkl"
 }
 
 ANALYSIS['model'] = {
