@@ -327,9 +327,11 @@ def main(env_file='.env'):
     audio_dir = os.getenv('AUDIO_DIR')
     transcript_dir = os.getenv('TRANSCRIPT_DIR')
     manifest_dir = os.getenv('MANIFEST_DIR')
-    output_dir = os.getenv('OUTPUT_DIR')
+    # output_dir = os.getenv('OUTPUT_DIR')
+    output_dir = cfg['output_dir']
+    # data_dfs_dir = os.getenv('DATA_DFS_DIR')
+    data_dfs_dir = cfg['data_dfs_dir']
     split_feat_dir = os.getenv('SPLIT_FEAT_DIR')
-    data_dfs_dir = os.getenv('DATA_DFS_DIR')
     num_jobs = int(os.getenv('NUM_JOBS')) if os.getenv('NUM_JOBS') else 8
     min_seg_duration = float(os.getenv('MIN_SEG_DURATION')) if os.getenv('MIN_SEG_DURATION') else 1.0
     use_kaldi = os.getenv('USE_KALDI') == 'True' if os.getenv('USE_KALDI') else False

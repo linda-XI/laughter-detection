@@ -226,7 +226,8 @@ def create_data_df(data_dir, num_of_laugh_samples, num_of_non_laugh_samples, mee
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv('.env'))
-    data_dfs_dir = os.getenv('DATA_DFS_DIR')
+    # data_dfs_dir = os.getenv('DATA_DFS_DIR')
+    data_dfs_dir = cfg['data_dfs_dir']
     num_of_laugh_samples = int(os.getenv('NUM_OF_LAUGH_SAMPLES'))
     num_of_non_laugh_samples = int(os.getenv('NUM_OF_NON_LAUGH_SAMPLES'))
     random_segment_selection = os.getenv('RANDOM_SELECTION') == 'True'
