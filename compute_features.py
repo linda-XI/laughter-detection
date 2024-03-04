@@ -37,6 +37,7 @@ from analysis.utils import to_frames
 import config as cfg
 import portion as P
 from collections import defaultdict
+from config import ANALYSIS as cfg1
 
 SPLITS = ['train', 'dev', 'test']
 PARTITIONS = {
@@ -328,9 +329,9 @@ def main(env_file='.env'):
     transcript_dir = os.getenv('TRANSCRIPT_DIR')
     manifest_dir = os.getenv('MANIFEST_DIR')
     # output_dir = os.getenv('OUTPUT_DIR')
-    output_dir = cfg['output_dir']
+    output_dir = cfg1['output_dir']
     # data_dfs_dir = os.getenv('DATA_DFS_DIR')
-    data_dfs_dir = cfg['data_dfs_dir']
+    data_dfs_dir = cfg1['data_dfs_dir']
     split_feat_dir = os.getenv('SPLIT_FEAT_DIR')
     num_jobs = int(os.getenv('NUM_JOBS')) if os.getenv('NUM_JOBS') else 8
     min_seg_duration = float(os.getenv('MIN_SEG_DURATION')) if os.getenv('MIN_SEG_DURATION') else 1.0
