@@ -252,7 +252,7 @@ ANALYSIS= {
     "force_index_recompute": False,
     #store all the predict laugh from seed model 
     "extra_laugh_dir": str(root_path / 'seedModel/newPredTrain'),
-    "test_df_dir": str(root_path / 'seedModel/extraonlyDF'),
+    "test_df_dir": str(root_path / 'seedModel/extraDF'),
     # "extra_laugh_sample": str(root_path / 'sample/extra_laugh_sample'),
     "extra_laugh_sample": str(root_path / 'seedModel/extraLaughSample'),
     # adding extra laugh into laugh_only_df with given threshold and minLen
