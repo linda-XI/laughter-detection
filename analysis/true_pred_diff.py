@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
 import os
+import Path
 # print the histogram of difference between true laughter and predict laughter 
 parser = argparse.ArgumentParser()
 # eval/extraLaugh/resnet18_small_0200/test
@@ -15,7 +16,8 @@ parser.add_argument('--thre', type=str, required=True)
 parser.add_argument('--minlen', type=str, required=True)
 parser.add_argument('--meet', type=str, required=True)
 parser.add_argument('--chan', type=str, required=True)
-
+parser.add_argument('--outpath', type=str, required=True)
+parser.add_argument('--model', type=str, required=True)
 args = parser.parse_args()
 
 textgrid_path = args.textgrid_path
@@ -24,6 +26,8 @@ threpath = args.thre
 minlenpath = args.minlen
 meet = args.meet
 chan = args.chan
+outpath = args.outpath
+model = args.model
 
 threpath = 't_'+ threpath
 minlenpath = 'l_' + minlenpath
@@ -120,4 +124,6 @@ plt.tight_layout()
 
 # plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name}.png')
 # Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
-# plt.savefig(plot_file)
+plot_file = os.path.join(outpath, model, (meet+'_'+chan+'_'+args.thre+args.minlen) )
+Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
+plt.savefig(outpath)
