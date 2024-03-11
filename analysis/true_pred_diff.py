@@ -36,10 +36,10 @@ true_df = pd.read_csv(true_path)
 def textgrid_to_df(file_path):
     tot_list = []
     if file_path.endswith('.TextGrid'):
-        full_path = os.path.join(file_path, file_path)
         
-        params = analyse.get_params_from_path(full_path)
-        tot_list += analyse.textgrid_to_list(full_path,
+        
+        params = analyse.get_params_from_path(file_path)
+        tot_list += analyse.textgrid_to_list(file_path,
                                         params)
     cols = ['meeting_id', 'part_id', 'chan', 'start',
             'end', 'length', 'threshold', 'min_len', 'laugh_type']
