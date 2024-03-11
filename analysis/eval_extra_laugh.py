@@ -28,7 +28,7 @@ df = pd.read_csv(csv_file_path)
 num_rows = len(df)
 print(f"Number of rows: {num_rows}")
 
-# Calculate the total length of laughter
+# Calculate the total length of extra laughter
 total_laugh_length = df[df['type'] == 'laugh']['length'].sum()
 print(f"Total length of laughter(with overlap): {total_laugh_length} seconds")
 
@@ -39,7 +39,7 @@ for meeting_id, meeting_df in meeting_groups:
         for part_id, part_df in part_groups:
             difference = new_laugh_index[meeting_id][part_id] - old_laugh_index[meeting_id][part_id]
             laugh_no_overlap = laugh_no_overlap | difference
-            
+# Calculate the extra laugh by using new index - old index            
 laugh_length_no_overlap = utils.to_sec(utils.p_len(laugh_no_overlap))
 print(f"Total length of laughter(without overlap): {laugh_length_no_overlap} seconds")
                 
