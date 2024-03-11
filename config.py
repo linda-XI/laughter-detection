@@ -257,13 +257,13 @@ ANALYSIS= {
     "extra_laugh_sample": str(root_path / 'seedModel/extraLaughSample'),
     # adding extra laugh into laugh_only_df with given threshold and minLen
     "threshold": 0.8,
-    "minLen": 0.0,
+    "minLen": 0.2,
     # dataframe are loaded from disk if possible. This option forces re-computation 
     # If True analyse.py will take a lot longer
     "force_df_recompute": False,
-    "cache_file" : ".cache/preprocessed_indices_0800.pkl",
-    "output_dir" : "output/0800_output",
-    "data_dfs_dir" : "./data/icsi/0800_data_dfs"
+    "cache_file" : ".cache/preprocessed_indices_0802.pkl",
+    "output_dir" : "output/0802_output",
+    "data_dfs_dir" : "./data/icsi/0802_data_dfs"
 }
 
 ANALYSIS['model'] = {
