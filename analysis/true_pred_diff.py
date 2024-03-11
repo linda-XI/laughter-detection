@@ -1,4 +1,4 @@
-import analyse
+from analyse import get_params_from_path, textgrid_to_list
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
@@ -42,8 +42,8 @@ def textgrid_to_df(file_path):
     if file_path.endswith('.TextGrid'):
         
         
-        params = analyse.get_params_from_path(file_path)
-        tot_list += analyse.textgrid_to_list(file_path,
+        params = get_params_from_path(file_path)
+        tot_list += textgrid_to_list(file_path,
                                         params)
     cols = ['meeting_id', 'part_id', 'chan', 'start',
             'end', 'length', 'threshold', 'min_len', 'laugh_type']
