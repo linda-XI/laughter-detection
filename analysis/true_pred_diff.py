@@ -33,7 +33,8 @@ threpath = 't_'+ threpath
 minlenpath = 'l_' + minlenpath
 chanpath = chan + '.TextGrid'
 
-textgrid_path = os.path.join(textgrid_path, meet, threpath, minlenpath, chanpath )
+# textgrid_path = os.path.join(textgrid_path, meet, threpath, minlenpath, chanpath )
+textgrid_path = os.path.join(textgrid_path, meet, threpath, minlenpath )
 true_df = pd.read_csv(true_path)
 
 
@@ -50,10 +51,26 @@ def textgrid_to_df(file_path):
     df = pd.DataFrame(tot_list, columns=cols)
     return df
 
+def textgrid_to_df_dir(file_path):
+    tot_list = []
+    for filename in os.listdir(file_path):
+        if filename.endswith('.TextGrid'):
+            full_path = os.path.join(file_path, filename)
+            
+            params = get_params_from_path(full_path)
+            tot_list += textgrid_to_list(full_path,
+                                         params)
+
+    cols = ['meeting_id', 'part_id', 'chan', 'start',
+            'end', 'length', 'threshold', 'min_len', 'laugh_type']
+    df = pd.DataFrame(tot_list, columns=cols)
+    return df
 
 
-sub_true = true_df[(true_df['meeting_id'] == meet) & (true_df['chan_id'] == chan)]
-df_predict = textgrid_to_df(textgrid_path)
+# sub_true = true_df[(true_df['meeting_id'] == meet) & (true_df['chan_id'] == chan)]
+sub_true = true_df[(true_df['meeting_id'] == meet)]
+df_predict = textgrid_to_df_dir(textgrid_path)
+df_predict = df_predict[(true_df['meeting_id'] == meet)]
 startDiff = []
 endDiff = []
 for index_true, row_true in sub_true.iterrows():
