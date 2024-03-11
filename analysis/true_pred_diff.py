@@ -66,7 +66,8 @@ for index_true, row_true in sub_true.iterrows():
         if trueStart>= predStart and trueStart <=predEnd:
             startDiff.append(trueStart - predStart)
             endDiff.append(trueEnd - predEnd)
-
+print(startDiff)
+# print(endDiff)
 plt.hist(startDiff)
 
 plt.title('Histogram Example')
