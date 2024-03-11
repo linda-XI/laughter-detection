@@ -70,7 +70,7 @@ def textgrid_to_df_dir(file_path):
 # sub_true = true_df[(true_df['meeting_id'] == meet) & (true_df['chan_id'] == chan)]
 sub_true = true_df[(true_df['meeting_id'] == meet)]
 df_predict = textgrid_to_df_dir(textgrid_path)
-df_predict = df_predict[(true_df['meeting_id'] == meet)]
+df_predict = df_predict[(df_predict['meeting_id'] == meet)]
 startDiff = []
 endDiff = []
 for index_true, row_true in sub_true.iterrows():
