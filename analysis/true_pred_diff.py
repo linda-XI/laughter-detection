@@ -1,11 +1,11 @@
-import analysis.analyse as analyse
+import analyse
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
 import os
 # print the histogram of difference between true laughter and predict laughter 
 parser = argparse.ArgumentParser()
-# eval/extraLaugh/resnet18_small_0200/test/
+# eval/extraLaugh/resnet18_small_0200/test
 # Bns001/t_0.8/l_0.2/chan0.TextGrid
 parser.add_argument('--textgrid_path', type=str, required=True)
 # seedModel/extraonlyDF/0.8_0.2/test_laugh_only_df.csv
