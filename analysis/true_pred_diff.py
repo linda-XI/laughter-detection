@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
 import os
-import Path
+from pathlib import Path
 # print the histogram of difference between true laughter and predict laughter 
 parser = argparse.ArgumentParser()
 # eval/extraLaugh/resnet18_small_0200/test
