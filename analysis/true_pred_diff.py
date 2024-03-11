@@ -30,13 +30,26 @@ minlenpath = 'l_' + minlenpath
 chanpath = chan + '.TextGrid'
 
 textgrid_path = os.path.join(textgrid_path, meet, threpath, minlenpath, chanpath )
-textgrid_df = analyse.textgrid_to_df(textgrid_path)
 true_df = pd.read_csv(true_path)
+
+
+def textgrid_to_df(file_path):
+    tot_list = []
+    if file_path.endswith('.TextGrid'):
+        full_path = os.path.join(file_path, file_path)
+        
+        params = analyse.get_params_from_path(full_path)
+        tot_list += analyse.textgrid_to_list(full_path,
+                                        params)
+    cols = ['meeting_id', 'part_id', 'chan', 'start',
+            'end', 'length', 'threshold', 'min_len', 'laugh_type']
+    df = pd.DataFrame(tot_list, columns=cols)
+    return df
 
 
 
 sub_true = true_df[(true_df['meeting_id'] == meet) & (true_df['chan_id'] == chan)]
-df_predict = pd.DataFrame()
+df_predict = textgrid_to_df(textgrid_path)
 startDiff = []
 endDiff = []
 for index_true, row_true in sub_true.iterrows():
