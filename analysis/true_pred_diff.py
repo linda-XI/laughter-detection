@@ -125,5 +125,6 @@ plt.tight_layout()
 # plot_file = os.path.join(cfg.ANALYSIS['plots_dir'], sub_dir, 'conf_matrix', f'{name}.png')
 # Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
 plot_file = os.path.join(outpath, model, (meet+'_'+chan+'_'+args.thre+args.minlen) )
-Path(plot_file).parent.mkdir(exist_ok=True, parents=True)
-plt.savefig(outpath)
+if not os.path.isdir(outpath):
+    os.mkdir(outpath)
+plt.savefig(plot_file)
