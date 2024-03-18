@@ -144,7 +144,8 @@ def load_and_pred(audio_path, full_output_dir):
     file_name = os.path.basename(audio_path)
     file_name_without_extension = os.path.splitext(file_name)[0]
     with open('probs'+file_name_without_extension+'.json', 'w') as filehandle:
-            json.dump(list(map(fix_over_underflow, probs)), filehandle)
+            p = map(fix_over_underflow, probs)
+            json.dump(p.tolist(), filehandle)
 
     file_length = audio_utils.get_audio_length(audio_path)
 
