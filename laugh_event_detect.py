@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str,
                     default='checkpoints/in_use/resnet_with_augmentation')
 parser.add_argument('--config', type=str, default='resnet_with_augmentation')
-parser.add_argument('--output_dir', type=str, default='output/0802_output/cutsets/test_cutset_with_feats.jsonl')
+parser.add_argument('--output_dir', type=str, default='output/0802_output')
 args = parser.parse_args()
 
 
@@ -18,8 +18,8 @@ config = config.MODEL_MAP[args.config]
 model_path = args.model_path
 
 cutset_dir = args.output_dir
-
-test_loader = load_data.create_training_dataloader(cutset_dir, 'dev', shuffle=True)
+print(cutset_dir)
+test_loader = load_data.create_training_dataloader(cutset_dir, 'test', shuffle=True)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device {device}")
 
