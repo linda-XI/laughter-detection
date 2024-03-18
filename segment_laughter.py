@@ -170,7 +170,7 @@ def load_and_pred(audio_path, full_output_dir):
         save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
     # return sum(batch_time_list), preprocessing_time, file_length
-    return 1, preprocessing_time, file_length
+    return 1, 1, file_length
 
 
 def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
