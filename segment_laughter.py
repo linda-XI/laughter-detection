@@ -103,7 +103,7 @@ def load_and_pred(audio_path, full_output_dir):
 
     probs = []
     for model_inputs in tqdm(inference_generator):
-        # x = torch.from_numpy(model_inputs).float().to(device)
+        ## x = torch.from_numpy(model_inputs).float().to(device)
         # Model inputs from new inference generator are tensors already
         model_inputs = model_inputs[:, None, :, :]  # add additional dimension
         x = model_inputs.float().to(device)
@@ -114,7 +114,7 @@ def load_and_pred(audio_path, full_output_dir):
         print(preds.shape)
 
         # ender.record()
-        torch.cuda.synchronize()
+        # torch.cuda.synchronize()
         # curr_time = starter.elapsed_time(ender)
         # batch_time_list.append(curr_time)
 
