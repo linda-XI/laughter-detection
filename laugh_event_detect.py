@@ -62,6 +62,8 @@ def _calc_metrics(trgs, preds):
     total_trg_laughs = torch.sum(trgs == 1).float()
     total_pred_laughs = torch.sum(preds == 1).float()
 
+    total_trg_non_laughs = torch.sum(trgs == 0).float()
+
     # if total_pred_laughs == 0:
     #     prec = torch.tensor(1.0) 
     # else:
@@ -86,6 +88,8 @@ for i, batch in tqdm(enumerate(test_loader)):
 
             trgs = torch.from_numpy(np.array(labs)).float().to(device)
             output = model(src).squeeze()
+            print(output)
+            print(output.shape)
 
             preds = torch.round(output)
             # sum(preds==trg).float()/len(preds)
