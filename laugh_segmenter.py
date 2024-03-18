@@ -57,8 +57,9 @@ def lowpass(sig, filter_order=2, cutoff=0.01):
 def fix_over_underflow(prob):
     ''' 
     Fixes probability that is out of the range (0,1) and sets them to
-    This seems to be a bug in the code taken from Gillick et al.
+    
     1 or slightly larger than 0 because threshold 0 shouldn't rule them out
+    This seems to be a bug in the code taken from Gillick et al.
 
     '''
     if prob > 1: 
