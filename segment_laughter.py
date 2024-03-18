@@ -111,7 +111,7 @@ def load_and_pred(audio_path, full_output_dir):
         # starter.record()
         preds = model(x).cpu().detach().numpy().squeeze()
 
-        print(preds.shape)
+        # print(preds.shape)=32
 
         # ender.record()
         # torch.cuda.synchronize()
