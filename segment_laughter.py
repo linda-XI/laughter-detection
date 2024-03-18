@@ -110,7 +110,9 @@ def load_and_pred(audio_path, full_output_dir):
 
         starter.record()
         preds = model(x).cpu().detach().numpy().squeeze()
+
         print(preds.shape)
+        
         ender.record()
         torch.cuda.synchronize()
         curr_time = starter.elapsed_time(ender)
