@@ -90,6 +90,7 @@ for i, batch in tqdm(enumerate(test_loader)):
             output = model(src).squeeze()
             print(output)
             print(output.shape)
+            print(labs)
 
             preds = torch.round(output)
             # sum(preds==trg).float()/len(preds)
