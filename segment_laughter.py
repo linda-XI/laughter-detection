@@ -25,6 +25,7 @@ import load_data
 sys.path.append('./utils/')
 import torch_utils
 import audio_utils
+import json
 
 parser = argparse.ArgumentParser()
 
@@ -85,7 +86,22 @@ if os.path.exists(model_path):
 else:
     raise Exception(f"Model checkpoint not found at {model_path}")
 
+def fix_over_underflow(prob):
+    ''' 
+    Fixes probability that is out of the range (0,1) and sets them to
+    
+    1 or slightly larger than 0 because threshold 0 shouldn't rule them out
+    This seems to be a bug in the code taken from Gillick et al.
 
+    '''
+    if prob > 1: 
+        print('WARN: Fixed probability > 1')
+        return 1
+    # <= to count also create predictions for threshold=0 when prob is 0
+    if prob <= 0: 
+        print('WARN: Fixed probability <= 0')
+        return 0.0000001
+    else: return prob
 # Load the audio file and features
 
 
@@ -124,6 +140,11 @@ def load_and_pred(audio_path, full_output_dir):
             preds = list(preds)
         probs += preds
     probs = np.array(probs)
+
+    file_name = os.path.basename(audio_path)
+    file_name_without_extension = os.path.splitext(file_name)[0]
+    with open('probs'+file_name_without_extension+'.json', 'w') as filehandle:
+            json.dump(list(map(fix_over_underflow, probs)), filehandle)
 
     file_length = audio_utils.get_audio_length(audio_path)
 

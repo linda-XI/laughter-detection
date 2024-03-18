@@ -84,8 +84,7 @@ def get_laughter_instances(probs, thresholds=[0.5], min_lengths=[0.2], fps=100.)
         (threshold, min_length): [laugh_instances]
     }
     '''
-    with open('probs.txt', 'w') as filehandle:
-            json.dump(probs, filehandle)
+    
     instance_dict = {}
 
     settings = [(thr, min_l) for thr in thresholds for min_l in min_lengths]
