@@ -1,4 +1,4 @@
-from .. import load_data
+import load_data
 from tqdm import tqdm
 import torch
 import argparse
