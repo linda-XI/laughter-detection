@@ -5,6 +5,7 @@ import argparse
 import config
 import os
 import torch_utils
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str,
