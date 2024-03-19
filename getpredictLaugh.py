@@ -33,7 +33,7 @@ for index_true, row_true in sub_laugh.iterrows():
 print(godChoose[:5])
 
 plt.figure(1)
-# plt.subplots(figsize=(6, 5))
+plt.subplots(figsize=(6, 10))
 plt.subplot(311)
 # hm = sns.heatmap(conf_ratio_by_rows, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
 plt.plot(godTime[0], godChoose[0])
