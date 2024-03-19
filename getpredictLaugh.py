@@ -24,7 +24,7 @@ sub_laugh = laugh_df[(laugh_df['meeting_id'] == meet) & (laugh_df['chan_id'] == 
 for index_true, row_true in sub_laugh.iterrows():
    laugh_start_frame = int(row_true['start']*100)
    laugh_end_frame = int(row_true['end']*100)
-#取出真笑声+-50的frame, 100个frame一秒
+#取出真笑声+-50的frame的probability, 100个frame一秒
    start = laugh_start_frame - 50
    end = laugh_end_frame + 50
    
@@ -33,26 +33,27 @@ for index_true, row_true in sub_laugh.iterrows():
 print(godChoose[:5])
 
 plt.figure(1)
-plt.subplot(311)
+plt.subplot(311,figsize=(6, 3))
 # hm = sns.heatmap(conf_ratio_by_rows, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
 plt.plot(godTime[0], godChoose[0])
 plt.title('sample1')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
-
+plt.invert_yaxis()
 # Plotting the second histogram
 plt.subplot(312)
 plt.plot(godTime[1], godChoose[1])
 plt.title('sample2')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
+plt.invert_yaxis()
 
 plt.subplot(313)
 plt.plot(godTime[2], godChoose[2])
 plt.title('sample3')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
-
+plt.invert_yaxis()
 # Adjust layout to prevent overlapping
 plt.tight_layout()
 
