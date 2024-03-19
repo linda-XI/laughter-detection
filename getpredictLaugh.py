@@ -58,3 +58,4 @@ plot_file = os.path.join(outpath, plot_file )
 print(plot_file)
 
 plt.savefig(plot_file)
+plt.cla()
