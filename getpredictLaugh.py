@@ -28,34 +28,34 @@ for index_true, row_true in sub_laugh.iterrows():
    start = laugh_start_frame - 50
    end = laugh_end_frame + 50
    
-   godChoose.append([format(num,'.1f') for num in data[start:end]])
+   godChoose.append([round(num,1) for num in data[start:end]])
    godTime.append([x for x in range(start, end)])
 print(godChoose[:5])
 
 plt.figure(1)
 plt.subplots(figsize=(6, 10))
-fig, ((ax1, ax2,ax3)) = plt.subplots(nrows=1, ncols=3)
+fig, ((ax1, ax2,ax3)) = plt.subplots(nrows=3, ncols=1)
 # plt.subplot(311)
 # hm = sns.heatmap(conf_ratio_by_rows, yticklabels=['laugh', 'not laugh'], annot=show_annotations, cmap="YlGnBu")
 ax1.plot(godTime[0], godChoose[0])
 ax1.set_title('sample1')
 ax1.set_xlabel('frame')
 ax1.set_ylabel('predict probability')
-ax3.set_yticks(np.arange(0, 1, 0.1))
+ax3.set_yticks(np.arange(0, 1.0, 0.1))
 # Plotting the second histogram
 # plt.subplot(312)
 ax2.plot(godTime[1], godChoose[1])
 ax2.set_title('sample2')
 ax2.set_xlabel('frame')
 ax2.set_ylabel('predict probability')
-ax3.set_yticks(np.arange(0, 1, 0.1))
+ax3.set_yticks(np.arange(0, 1.0, 0.1))
 
 # plt.subplot(313)
 ax3.plot(godTime[3], godChoose[3])
 ax3.set_title('sample3')
 ax3.set_xlabel('frame')
 ax3.set_ylabel('predict probability')
-ax3.set_yticks(np.arange(0, 1, 0.1))
+ax3.set_yticks(np.arange(0, 1.0, 0.1))
 
 # Adjust layout to prevent overlapping
 plt.tight_layout()
