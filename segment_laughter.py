@@ -111,11 +111,11 @@ def load_and_pred(audio_path, full_output_dir):
     Output: time taken to predict (excluding the generation of output files)
     Loads audio, runs prediction and outputs results according to flag-settings (e.g. TextGrid or Audio)
     '''
-    # start_time = time.time()  # Start measuring time
-    # starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+    start_time = time.time()  # Start measuring time
+    starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
     batch_time_list = []
     inference_generator = load_data.create_inference_dataloader(audio_path)
-    # preprocessing_time = time.time() - start_time  # stop measuring time
+    preprocessing_time = time.time() - start_time  # stop measuring time
 
     probs = []
     for model_inputs in tqdm(inference_generator):
@@ -124,15 +124,15 @@ def load_and_pred(audio_path, full_output_dir):
         model_inputs = model_inputs[:, None, :, :]  # add additional dimension
         x = model_inputs.float().to(device)
 
-        # starter.record()
+        starter.record()
         preds = model(x).cpu().detach().numpy().squeeze()
 
         # print(preds.shape)=32
 
-        # ender.record()
-        # torch.cuda.synchronize()
-        # curr_time = starter.elapsed_time(ender)
-        # batch_time_list.append(curr_time)
+        ender.record()
+        torch.cuda.synchronize()
+        curr_time = starter.elapsed_time(ender)
+        batch_time_list.append(curr_time)
 
         if len(preds.shape) == 0:
             preds = [float(preds)]
@@ -159,9 +159,9 @@ def load_and_pred(audio_path, full_output_dir):
     instance_dict = laugh_segmenter.get_laughter_instances(
         probs, thresholds=thresholds, min_lengths=min_lengths, fps=fps)
 
-    # time_taken = time.time() - start_time  # stop measuring time
-    # time_avg = sum(batch_time_list) / len(probs)
-    time_avg = 0
+    time_taken = time.time() - start_time  # stop measuring time
+    time_avg = sum(batch_time_list) / len(probs)
+    # time_avg = 0
     print(f'GPU time for inference per batch: {time_avg:.2f}s')
 
     for setting, instances in instance_dict.items():
@@ -169,8 +169,8 @@ def load_and_pred(audio_path, full_output_dir):
         instance_output_dir = os.path.join(full_output_dir, f't_{setting[0]}', f'l_{setting[1]}')
         save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
-    # return sum(batch_time_list), preprocessing_time, file_length
-    return 1, 1, file_length
+    return sum(batch_time_list), preprocessing_time, file_length
+    # return 1, 1, file_length
 
 
 def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
