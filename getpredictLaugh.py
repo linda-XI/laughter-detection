@@ -4,7 +4,7 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-
+import numpy as np
 true_path = 'seedModel/extraDF/0.8_0.2/test_laugh_only_df.csv'
 with open('probschan3.json', 'r') as f:
   data = json.load(f)
@@ -40,21 +40,21 @@ plt.plot(godTime[0], godChoose[0])
 plt.title('sample1')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
-plt.ylim((0.0,1.0)) 
+plt.yticks(np.arange(0, 1, step=0.2))
 # Plotting the second histogram
 plt.subplot(312)
 plt.plot(godTime[1], godChoose[1])
 plt.title('sample2')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
-plt.ylim((0.0,1.0)) 
+plt.yticks(np.arange(0, 1, step=0.2))
 
 plt.subplot(313)
 plt.plot(godTime[2], godChoose[2])
 plt.title('sample3')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
-plt.ylim((0.0,1.0)) 
+plt.yticks(np.arange(0, 1, step=0.2))
 # Adjust layout to prevent overlapping
 plt.tight_layout()
 
