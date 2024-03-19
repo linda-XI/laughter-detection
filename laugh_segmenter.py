@@ -4,6 +4,7 @@ import scipy
 import os
 import sys
 import librosa
+import json
 
 #import compute_features
 
@@ -57,8 +58,9 @@ def lowpass(sig, filter_order=2, cutoff=0.01):
 def fix_over_underflow(prob):
     ''' 
     Fixes probability that is out of the range (0,1) and sets them to
-    This seems to be a bug in the code taken from Gillick et al.
+    
     1 or slightly larger than 0 because threshold 0 shouldn't rule them out
+    This seems to be a bug in the code taken from Gillick et al.
 
     '''
     if prob > 1: 
@@ -82,6 +84,7 @@ def get_laughter_instances(probs, thresholds=[0.5], min_lengths=[0.2], fps=100.)
         (threshold, min_length): [laugh_instances]
     }
     '''
+    
     instance_dict = {}
 
     settings = [(thr, min_l) for thr in thresholds for min_l in min_lengths]
@@ -89,6 +92,7 @@ def get_laughter_instances(probs, thresholds=[0.5], min_lengths=[0.2], fps=100.)
         instances = []
         current_list = []
         probs = list(map(fix_over_underflow, probs))
+
         for i in range(len(probs)):
             # Check if this AND the following frame are laughter
             if np.min(probs[i:i+1]) > thr:

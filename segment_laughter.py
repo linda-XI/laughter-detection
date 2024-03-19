@@ -25,6 +25,7 @@ import load_data
 sys.path.append('./utils/')
 import torch_utils
 import audio_utils
+import json
 
 parser = argparse.ArgumentParser()
 
@@ -85,7 +86,22 @@ if os.path.exists(model_path):
 else:
     raise Exception(f"Model checkpoint not found at {model_path}")
 
+def fix_over_underflow(prob):
+    ''' 
+    Fixes probability that is out of the range (0,1) and sets them to
+    
+    1 or slightly larger than 0 because threshold 0 shouldn't rule them out
+    This seems to be a bug in the code taken from Gillick et al.
 
+    '''
+    if prob > 1: 
+        print('WARN: Fixed probability > 1')
+        return 1
+    # <= to count also create predictions for threshold=0 when prob is 0
+    if prob <= 0: 
+        print('WARN: Fixed probability <= 0')
+        return 0.0000001
+    else: return prob
 # Load the audio file and features
 
 
@@ -95,25 +111,28 @@ def load_and_pred(audio_path, full_output_dir):
     Output: time taken to predict (excluding the generation of output files)
     Loads audio, runs prediction and outputs results according to flag-settings (e.g. TextGrid or Audio)
     '''
-    start_time = time.time()  # Start measuring time
-    starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
+    # start_time = time.time()  # Start measuring time
+    # starter, ender = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
     batch_time_list = []
     inference_generator = load_data.create_inference_dataloader(audio_path)
-    preprocessing_time = time.time() - start_time  # stop measuring time
+    # preprocessing_time = time.time() - start_time  # stop measuring time
 
     probs = []
     for model_inputs in tqdm(inference_generator):
-        # x = torch.from_numpy(model_inputs).float().to(device)
+        ## x = torch.from_numpy(model_inputs).float().to(device)
         # Model inputs from new inference generator are tensors already
         model_inputs = model_inputs[:, None, :, :]  # add additional dimension
         x = model_inputs.float().to(device)
 
-        starter.record()
+        # starter.record()
         preds = model(x).cpu().detach().numpy().squeeze()
-        ender.record()
-        torch.cuda.synchronize()
-        curr_time = starter.elapsed_time(ender)
-        batch_time_list.append(curr_time)
+
+        # print(preds.shape)=32
+
+        # ender.record()
+        # torch.cuda.synchronize()
+        # curr_time = starter.elapsed_time(ender)
+        # batch_time_list.append(curr_time)
 
         if len(preds.shape) == 0:
             preds = [float(preds)]
@@ -121,6 +140,12 @@ def load_and_pred(audio_path, full_output_dir):
             preds = list(preds)
         probs += preds
     probs = np.array(probs)
+
+    file_name = os.path.basename(audio_path)
+    file_name_without_extension = os.path.splitext(file_name)[0]
+    with open('probs'+file_name_without_extension+'.json', 'w') as filehandle:
+            
+            json.dump(probs.tolist(), filehandle)
 
     file_length = audio_utils.get_audio_length(audio_path)
 
@@ -135,7 +160,8 @@ def load_and_pred(audio_path, full_output_dir):
         probs, thresholds=thresholds, min_lengths=min_lengths, fps=fps)
 
     # time_taken = time.time() - start_time  # stop measuring time
-    time_avg = sum(batch_time_list) / len(probs)
+    # time_avg = sum(batch_time_list) / len(probs)
+    time_avg = 0
     print(f'GPU time for inference per batch: {time_avg:.2f}s')
 
     for setting, instances in instance_dict.items():
@@ -143,7 +169,8 @@ def load_and_pred(audio_path, full_output_dir):
         instance_output_dir = os.path.join(full_output_dir, f't_{setting[0]}', f'l_{setting[1]}')
         save_instances(instances, instance_output_dir, save_to_audio_files, save_to_textgrid, audio_path)
 
-    return sum(batch_time_list), preprocessing_time, file_length
+    # return sum(batch_time_list), preprocessing_time, file_length
+    return 1, 1, file_length
 
 
 def save_instances(instances, output_dir, save_to_audio_files, save_to_textgrid, full_audio_path):
