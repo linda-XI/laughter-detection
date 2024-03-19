@@ -50,7 +50,7 @@ plt.ylabel('predict probability')
 plt.yticks(np.arange(0, 1, step=0.2))
 
 plt.subplot(313)
-plt.plot(godTime[2], godChoose[2])
+plt.plot(godTime[3], godChoose[3])
 plt.title('sample3')
 plt.xlabel('frame')
 plt.ylabel('predict probability')
