@@ -140,11 +140,16 @@ def load_and_pred(audio_path, full_output_dir):
             preds = list(preds)
         probs += preds
     probs = np.array(probs)
-    
+
     # get probchan.json
-    # file_name = os.path.basename(audio_path)
-    # file_name_without_extension = os.path.splitext(file_name)[0]
-    # with open('probs'+file_name_without_extension+'.json', 'w') as filehandle:
+
+    # components = audio_path.split('/')
+    # meet = components[-2]
+    # chan = components[-1].split('.')[0]
+    # outpath = 'sample/probchan/'
+    # if not os.path.isdir(outpath):
+    #     os.makedirs(outpath)
+    # with open(outpath + 'probs'+meet+chan+'.json', 'w') as filehandle:
             
     #         json.dump(probs.tolist(), filehandle)
 

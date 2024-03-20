@@ -76,6 +76,8 @@ class InferenceDataset(torch.utils.data.Dataset):
     """ 
 
     def __init__(self, feats, n_frames=cfg.FEAT['num_samples']) -> None:
+        #    "num_samples": 100 frame = 1 second
+        # "num_filters": 44
         super().__init__()
         self.feats = feats # The feature representation for the whole meeting
         self.n_frames = n_frames
