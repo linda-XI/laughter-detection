@@ -18,11 +18,9 @@ def seconds_to_frames(s, fps=100):
 
 
 def collapse_to_start_and_end_frame(instance_list, fps = 100):
-    
-    if instance_list[0] < fps:
-        instance_list[0] = 0
-        instance_list[-1] = instance_list[-1] - instance_list[0]
-        #shift the sample left by 100 frame
+    #shift the sample left by 100 frame
+    if instance_list[0] <= fps:
+        return (0 , instance_list[-1] - instance_list[0])
     return (instance_list[0] - fps, instance_list[-1] - fps)
 
 
