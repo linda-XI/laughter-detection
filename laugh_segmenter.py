@@ -20,7 +20,7 @@ def seconds_to_frames(s, fps=100):
 def collapse_to_start_and_end_frame(instance_list, fps = 100):
     #shift the sample left by 50 frame
     if instance_list[0] <= fps/2:
-        return (0 , instance_list[-1] - instance_list[0])
+        return (0 , 0)
     return (instance_list[0] - fps, instance_list[-1] - fps)
 
 
@@ -109,7 +109,9 @@ def get_laughter_instances(probs, thresholds=[0.5], min_lengths=[0.2], fps=100.)
             instances.append(current_list)
         # Reduce each laugh instance to it's start and end-frame
         instances = [frame_span_to_time_span(
-            collapse_to_start_and_end_frame(i), fps=fps) for i in instances]
+            collapse_to_start_and_end_frame(i), fps=fps) for i in instances if i[0]>=fps/2]
+        # instances = [frame_span_to_time_span(
+        #     collapse_to_start_and_end_frame(i), fps=fps) for i in instances]
         
         # Filter out those instances that don't meet the min_length
         instances = [inst for inst in instances if inst[1]-inst[0] > min_l]
