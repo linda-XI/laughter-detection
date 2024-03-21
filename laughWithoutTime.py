@@ -193,7 +193,7 @@ def create_evaluation_df(path, out_path):
             
                 thr_val = threshold.replace('t_', '')
                 min_len_val = min_length.replace('l_', '')
-                out = eval_preds(pred_laughs, meeting_id, thr_val, min_len_val)
+                out = eval_preds(pred_laughs, meeting_id, thr_val, min_len_val,print_stats=True)
                 all_evals.append(out)
     cols = ['meeting', 'threshold', 'min_len', 'precision', 'recall']
 
