@@ -171,7 +171,7 @@ def eval_preds(pred_per_meeting_df, meeting_id, threshold, min_len, print_stats=
               f'Threshold: {threshold}\n'
               f'Precision: {prec:.4f}\n'
               f'Recall: {recall:.4f}\n')
-    return[meeting_id, threshold, min_len, prec, recall]
+    return[meeting_id, threshold, min_len, prec, recall, TP,FP,FN,TN]
         
 def create_evaluation_df(path, out_path):
     """
@@ -195,7 +195,7 @@ def create_evaluation_df(path, out_path):
                 min_len_val = min_length.replace('l_', '')
                 out = eval_preds(pred_laughs, meeting_id, thr_val, min_len_val,print_stats=True)
                 all_evals.append(out)
-    cols = ['meeting', 'threshold', 'min_len', 'precision', 'recall']
+    cols = ['meeting', 'threshold', 'min_len', 'precision', 'recall','TP','FP','FN','TN']
 
     if len(cols) != len(all_evals[0]):
         raise Exception(
@@ -214,16 +214,16 @@ def calc_sum_stats(eval_df):
 
     # New version - calculating metrics once for the whole corpus 
     # - solves problem with different length meetings
-    sum_vals = eval_df.groupby(['min_len', 'threshold'])[['corr_pred_time','tot_pred_time','tot_transc_laugh_time']].agg(['sum']).reset_index()
+    sum_vals = eval_df.groupby(['min_len', 'threshold'])[['TP','FP','FN']].agg(['sum']).reset_index()
 
     # Flatten Multi-index to Single-index
     sum_vals.columns = sum_vals.columns.map('{0[0]}'.format) 
 
-    sum_vals['precision'] = sum_vals['corr_pred_time'] / sum_vals['tot_pred_time']
+    sum_vals['precision'] = sum_vals['TP'] / (sum_vals['TP']+sum_vals['FP'])
     # If tot_pred_time was zero set precision to 1
-    sum_vals.loc[sum_vals.tot_pred_time == 0, 'precision'] = 1 
+    sum_vals.loc[(sum_vals['TP']+sum_vals['FP']) == 0, 'precision'] = 1 
 
-    sum_vals['recall'] = sum_vals['corr_pred_time'] / sum_vals['tot_transc_laugh_time']
+    sum_vals['recall'] = sum_vals['TP'] / (sum_vals['TP']+sum_vals['FN'])
     sum_stats = sum_vals[['threshold', 'min_len', 'precision', 'recall']]
     # Filter thresholds
     #sum_stats = sum_stats[sum_stats['threshold'].isin([0.2,0.4,0.6,0.8])]
