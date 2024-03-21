@@ -171,17 +171,17 @@ def laugh_match(pred_laugh, meeting_id, part_id):
         # Remove laughter occurring in mixed settings because we don't evaluate them
         pred_laugh = pred_laugh - prep.invalid_index[meeting_id][part_id]
     #remove overlap participant in testSet
-    overlap_part_interval = remove_overlapPart(meeting_id, part_id)
-    pred_laugh = pred_laugh - overlap_part_interval
+    # overlap_part_interval = remove_overlapPart(meeting_id, part_id)
+    # pred_laugh = pred_laugh - overlap_part_interval
 
     pred_length = utils.to_sec(utils.p_len(pred_laugh))
 
     correct = 0 
     incorrect = pred_length
     if part_id in prep.laugh_index[meeting_id].keys():
-        # correct = seg_index_overlap(prep.laugh_index, pred_laugh, meeting_id, part_id)
+        correct = seg_index_overlap(prep.laugh_index, pred_laugh, meeting_id, part_id)
         # seg_index_overlap_laugh resonsible for remove overlap participant in testSet 
-        correct = seg_index_overlap_laugh(prep.laugh_index, pred_laugh, meeting_id, part_id)
+        # correct = seg_index_overlap_laugh(prep.laugh_index, pred_laugh, meeting_id, part_id)
         incorrect = pred_length - correct
 
     # Get type of misclassification 
