@@ -250,6 +250,7 @@ def analyse(preds_dir):
     else:
         # Then create or load eval_df -> stats for each meeting
         eval_df = create_evaluation_df(preds_dir, eval_df_out_path)
+        print(eval_df)
         # stats_for_different_min_length(preds_path)
         sum_stats = calc_sum_stats(eval_df)
         print('\nWeighted summary stats across all meetings:')
