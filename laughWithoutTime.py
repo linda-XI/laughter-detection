@@ -202,6 +202,7 @@ def create_evaluation_df(path, out_path):
             f'List returned by eval_preds() has wrong length. Expected length: {len(cols)}. Found: {len(all_evals[0])}.')
     eval_df = pd.DataFrame(all_evals, columns=cols)
     eval_df.to_csv(out_path, index=False)
+    return eval_df
 
 def calc_sum_stats(eval_df):
     """
